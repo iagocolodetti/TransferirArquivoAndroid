@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#303030"
+    android:orientation="vertical"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/mytoolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ToolBarStyle"
+        app:navigationIcon="@mipmap/ic_launcher"
+        app:popupTheme="@style/ToolBarStyle" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvIP"
+                android:layout_width="21dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:text="IP:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etIP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:background="@android:drawable/editbox_background"
+                android:digits="0123456789."
+                android:ems="10"
+                android:inputType="number"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvPorta"
+                android:layout_width="21dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:text="Porta:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etPorta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:background="@android:drawable/editbox_background"
+                android:ems="10"
+                android:inputType="number"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etArmazenamento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="none"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:text="Local de Armazenamento"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rbInterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Interno"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/rbExterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Externo"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+            </RadioGroup>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btConectar"
+                android:layout_width="200dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:background="@drawable/btacende"
+                android:text="CONECTAR"
+                android:textSize="16sp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvArquivo"
+                android:layout_width="21dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:text="Arquivo:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etArquivo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ems="10"
+                android:inputType="none"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvTamanho"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2"
+                android:text="Tamanho:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etTamanho"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.6"
+                android:ems="10"
+                android:inputType="none"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/sprTamanho"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.2" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btSelecionar"
+                android:layout_width="90dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:background="@drawable/btacende"
+                android:text="Selecionar"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <CheckBox
+                    android:id="@+id/cbLote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:button="@drawable/custom_checkbox"
+                    android:text="Lote"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btEnviar"
+                android:layout_width="90dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:background="@drawable/btacende"
+                android:text="Enviar"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="21dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.35"
+                android:text="Status:"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/etStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.65"
+                android:ems="10"
+                android:inputType="none"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/pbStatus"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="15dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/custom_progressbar" />
+
+            <TextView
+                android:id="@+id/tvProgresso"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:layout_alignTop="@id/pbStatus"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="11sp"/>
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/svAreaLog"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginTop="10dp"
+            android:scrollbarStyle="insideInset"
+            android:scrollbarThumbVertical="@drawable/custom_scrollbar_area_log"
+            android:fadeScrollbars="false">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/tvAreaLog"
+                android:ems="10"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:gravity="start|top" />
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>
