@@ -17,37 +17,66 @@
  */
 package br.com.iagocolodetti.transferirarquivo;
 
-import java.io.File;
-import java.io.Serializable;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.OpenableColumns;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 /**
  *
  * @author iagocolodetti
  */
-public class Arquivo implements Serializable {
+public class Arquivo {
 
-    private static final long serialVersionUID = 5925451328785184659L;
+    private ContentResolver contentResolver;
+    private Uri uri;
+    private String name;
+    private long size;
 
-    private File arquivo;
-
-    public Arquivo() {
-
+    public Arquivo(Context context, Uri uri) throws FileNotFoundException {
+        contentResolver = context.getContentResolver();
+        this.uri = uri;
+        Cursor cursor = null;
+        try {
+            cursor = contentResolver.query(uri, null, null, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                name = cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME));
+                int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (!cursor.isNull(sizeIndex)) {
+                    size = Long.parseLong(cursor.getString(sizeIndex));
+                } else {
+                    throw new FileNotFoundException(context.getString(R.string.erro_arquivo_tamanho));
+                }
+            }
+            if (name == null || name.isEmpty()) throw new FileNotFoundException(context.getString(R.string.erro_arquivo_nome));
+        } catch (FileNotFoundException ex) {
+            throw new FileNotFoundException(context.getString(R.string.erro_arquivo_nao_encontrado));
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
-    public Arquivo(File arquivo) {
-        this.arquivo = arquivo;
+    public InputStream getInputStream() throws FileNotFoundException {
+        return contentResolver.openInputStream(uri);
     }
 
-    public void setArquivo(File arquivo) {
-        this.arquivo = arquivo;
+    public String getName() {
+        return name;
     }
 
-    public File getArquivo() {
-        return arquivo;
+    public long getSize() {
+        return size;
     }
 
     @Override
     public boolean equals(Object object) {
-        return getArquivo().equals(((Arquivo)object).getArquivo());
+        return getName().equals(((Arquivo)object).getName())
+                && getSize() == ((Arquivo)object).getSize();
     }
 }

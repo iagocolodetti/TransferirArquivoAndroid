@@ -10,8 +10,8 @@
     android:focusableInTouchMode="true"
     tools:context=".MainActivity">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/mytoolbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/myToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
@@ -35,7 +35,7 @@
                 android:layout_width="21dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.35"
-                android:text="IP:"
+                android:text="@string/tv_ip"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -47,11 +47,16 @@
                 android:background="@android:drawable/editbox_background"
                 android:digits="0123456789."
                 android:ems="10"
+                android:hint="@string/et_ip_hint"
+                android:textColorHint="@color/hintColor"
+                android:importantForAutofill="no"
                 android:inputType="number"
+                android:labelFor="@id/tvIP"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -65,7 +70,7 @@
                 android:layout_width="21dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.35"
-                android:text="Porta:"
+                android:text="@string/tv_porta"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -76,12 +81,17 @@
                 android:layout_weight="0.65"
                 android:background="@android:drawable/editbox_background"
                 android:ems="10"
+                android:hint="@string/et_porta_hint"
+                android:textColorHint="@color/hintColor"
+                android:importantForAutofill="no"
                 android:inputType="number"
+                android:labelFor="@id/tvPorta"
                 android:maxLength="5"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -91,47 +101,46 @@
 
             <EditText
                 android:id="@+id/etArmazenamento"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:hint="@string/et_armazenamento"
+                android:importantForAutofill="no"
                 android:inputType="none"
                 android:maxLines="1"
                 android:singleLine="true"
+                android:text="@string/et_armazenamento"
                 android:textAlignment="center"
-                android:text="Local de Armazenamento"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
-        <LinearLayout
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/rbInterno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/rb_interno"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck" />
 
-                <RadioButton
-                    android:id="@+id/rbInterno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Interno"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
-
-                <RadioButton
-                    android:id="@+id/rbExterno"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Externo"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
-            </RadioGroup>
-        </LinearLayout>
+            <RadioButton
+                android:id="@+id/rbExterno"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/rb_externo"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck" />
+        </RadioGroup>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -143,11 +152,12 @@
                 android:id="@+id/btConectar"
                 android:layout_width="200dp"
                 android:layout_height="35dp"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="@drawable/btacende"
-                android:text="CONECTAR"
+                android:text="@string/bt_conectar"
                 android:textSize="16sp"
-                android:layout_gravity="center"/>
+                tools:ignore="InefficientWeight,TouchTargetSizeCheck,TextContrastCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -161,7 +171,7 @@
                 android:layout_width="21dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.35"
-                android:text="Arquivo:"
+                android:text="@string/tv_arquivo"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -171,12 +181,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.65"
                 android:ems="10"
+                android:importantForAutofill="no"
                 android:inputType="none"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:hint="@string/et_arquivo_hint"
+                android:textColorHint="@color/hintColor"
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -189,7 +203,7 @@
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
-                android:text="Tamanho:"
+                android:text="@string/tv_tamanho"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -199,18 +213,24 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.6"
                 android:ems="10"
+                android:hint="@string/et_tamanho_hint"
+                android:textColorHint="@color/hintColor"
+                android:importantForAutofill="no"
                 android:inputType="none"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck" />
 
             <Spinner
                 android:id="@+id/sprTamanho"
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.2" />
+                android:layout_weight="0.2"
+                android:contentDescription="@string/spr_tamanho_description"
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -225,8 +245,9 @@
                 android:layout_height="35dp"
                 android:layout_weight="1"
                 android:background="@drawable/btacende"
-                android:text="Selecionar"
-                android:textSize="16sp" />
+                android:text="@string/bt_selecionar"
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -237,13 +258,14 @@
                 <CheckBox
                     android:id="@+id/cbLote"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:button="@drawable/custom_checkbox"
-                    android:text="Lote"
+                    android:text="@string/cb_lote"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="NestedWeights,TouchTargetSizeCheck" />
             </LinearLayout>
 
             <Button
@@ -252,8 +274,9 @@
                 android:layout_height="35dp"
                 android:layout_weight="1"
                 android:background="@drawable/btacende"
-                android:text="Enviar"
-                android:textSize="16sp" />
+                android:text="@string/bt_enviar"
+                android:textSize="16sp"
+                tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
         </LinearLayout>
 
         <LinearLayout
@@ -266,7 +289,7 @@
                 android:layout_width="21dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.35"
-                android:text="Status:"
+                android:text="@string/tv_status"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -276,12 +299,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.65"
                 android:ems="10"
+                android:importantForAutofill="no"
                 android:inputType="none"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:hint="@string/et_status_hint"
+                android:textColorHint="@color/hintColor"
+                tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
         <RelativeLayout

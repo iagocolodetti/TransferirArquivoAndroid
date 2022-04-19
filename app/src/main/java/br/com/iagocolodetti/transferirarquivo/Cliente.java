@@ -20,7 +20,7 @@ package br.com.iagocolodetti.transferirarquivo;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +42,7 @@ public class Cliente {
     private final int MIN_PORTA = 0;
     private final int MAX_PORTA = 65535;
 
-    private MainActivity mainActivity = null;
+    private MainActivity mainActivity;
 
     private Socket socket = null;
 
@@ -53,6 +53,7 @@ public class Cliente {
 
     private final int CONNECT_TIMEOUT = 5000;
     private final int TENTATIVAS_RECONEXAO = 5;
+    private final int AGUARDAR_PARA_RECONECTAR = 500;
     private final int AGUARDAR_APOS_ENVIO = 2000;
     private final int AGUARDAR_APOS_ENVIO_LOOP = 10;
 
@@ -62,16 +63,16 @@ public class Cliente {
 
     public void conectar(String ip, int porta, String diretorio) throws ClienteConectarException {
         if (ip.isEmpty()) {
-            throw new ClienteConectarException("Entre com o IP do servidor.");
+            throw new ClienteConectarException(mainActivity.getString(R.string.erro_ip_nao_definido));
         }
         if (!Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$").matcher(ip).matches()) {
-            throw new ClienteConectarException("Digite um IP válido.");
+            throw new ClienteConectarException(mainActivity.getString(R.string.erro_ip_invalido));
         }
         if (porta < MIN_PORTA || porta > MAX_PORTA) {
-            throw new ClienteConectarException("A porta deve ser no mínimo " + MIN_PORTA + " e no máximo " + MAX_PORTA + ".");
+            throw new ClienteConectarException(mainActivity.getString(R.string.erro_porta_fora_do_limite, MIN_PORTA, MAX_PORTA));
         }
         if (!new File(diretorio).exists() && !new File(diretorio).mkdir()) {
-            throw new ClienteConectarException("Não foi possível usar o diretório selecionado.");
+            throw new ClienteConectarException(mainActivity.getString(R.string.erro_diretorio));
         }
         mainActivity.conectando();
         Thread t = new Thread(new ClienteConectar(ip, porta, diretorio));
@@ -84,8 +85,8 @@ public class Cliente {
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
         } finally {
             socket = null;
             mainActivity.desconectado();
@@ -94,13 +95,13 @@ public class Cliente {
 
     public void enviarArquivos(ArrayList<Arquivo> arquivos) throws EnviarArquivoException {
         if (!isSocketConnected()) {
-            throw new EnviarArquivoException("É necessário estar conectado a um servidor para enviar arquivos.");
+            throw new EnviarArquivoException(mainActivity.getString(R.string.erro_enviar_nao_conectado));
         }
         if (arquivos == null || arquivos.isEmpty()) {
-            throw new EnviarArquivoException("Selecione pelo menos um arquivo para enviar.");
+            throw new EnviarArquivoException(mainActivity.getString(R.string.erro_enviar_sem_arquivo));
         }
-        if (recebendoArquivo ||  enviandoArquivos()) {
-            throw new EnviarArquivoException("Uma transferência já está em andamento.");
+        if (recebendoArquivo || enviandoArquivos()) {
+            throw new EnviarArquivoException(mainActivity.getString(R.string.erro_enviar_ja_transferindo));
         }
         enviandoArquivo = new Thread(new EnviarArquivos(arquivos));
         enviandoArquivo.start();
@@ -124,9 +125,9 @@ public class Cliente {
 
     private class ClienteConectar implements Runnable {
 
-        private String ip = "";
-        private int porta = 0;
-        private String diretorio = "";
+        private String ip;
+        private int porta;
+        private String diretorio;
 
         public ClienteConectar(String ip, int porta, String diretorio) {
             conectado = true;
@@ -140,6 +141,7 @@ public class Cliente {
             while (conectado) {
                 recebendoArquivo = false;
                 if (!isSocketConnected()) {
+                    esperar(socket == null ? 0 : AGUARDAR_PARA_RECONECTAR);
                     int tentativas = 0;
                     while (conectado && tentativas < TENTATIVAS_RECONEXAO) {
                         try {
@@ -148,28 +150,28 @@ public class Cliente {
                             socket.connect(new InetSocketAddress(ip, porta), CONNECT_TIMEOUT);
                             mainActivity.conectado();
                             break;
-                        } catch (IllegalArgumentException e) {
-                            mainActivity.exibirMensagem("Erro: IP e/ou porta incorreto(s).");
+                        } catch (IllegalArgumentException ex) {
+                            mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_ip_porta_incorreto));
                             desconectar();
-                            e.printStackTrace();
+                            ex.printStackTrace();
                             break;
-                        } catch (IOException e) {
+                        } catch (IOException ex) {
                             tentativas++;
-                            e.printStackTrace();
+                            ex.printStackTrace();
                         }
                     }
                     if (tentativas == TENTATIVAS_RECONEXAO) {
-                        mainActivity.exibirMensagem("Erro: Não foi possível conectar-se a esse servidor.");
+                        mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_nao_possivel_conectar));
                         desconectar();
                     }
                 }
                 if (conectado) {
-                    InputStream in = null;
+                    InputStream is = null;
                     DataInputStream dis = null;
                     OutputStream out = null;
                     try {
-                        in = socket.getInputStream();
-                        dis = new DataInputStream(in);
+                        is = socket.getInputStream();
+                        dis = new DataInputStream(is);
                         String[] data = dis.readUTF().split(Pattern.quote("|"));
                         recebendoArquivo = true;
                         esperar(1000);
@@ -180,42 +182,42 @@ public class Cliente {
                         long tamanho = Long.parseLong(data[1]);
                         long tamanhokb = (data[1].equals("0") ? 1 : tamanho / 1024);
                         tamanhokb = (tamanhokb == 0 ? 1 : tamanhokb);
-                        in = socket.getInputStream();
+                        is = socket.getInputStream();
                         out = new FileOutputStream(diretorio + novoNomeArquivo);
                         mainActivity.permanecerAcordado(true);
-                        mainActivity.setStatus("Recebendo Arquivo");
-                        mainActivity.addAreaLog("Recebendo Arquivo: \"" + novoNomeArquivo + "\".");
+                        mainActivity.setStatus(mainActivity.getString(R.string.status_recebendo_arquivo));
+                        mainActivity.addAreaLog(mainActivity.getString(R.string.recebendo_arquivo, novoNomeArquivo));
                         byte[] buffer = new byte[1024];
                         long bytesRecebidos = 0;
                         int count;
                         long kb = 0;
                         int progresso;
-                        while ((count = in.read(buffer)) > 0) {
+                        while ((count = is.read(buffer)) > 0) {
                             out.write(buffer, 0, count);
                             bytesRecebidos += count;
-                            progresso = (int)(++kb * 100 / tamanhokb);
+                            progresso = (int) (++kb * 100 / tamanhokb);
                             mainActivity.setStatusProgress(progresso < 100 ? progresso : 100);
                         }
                         if (bytesRecebidos == tamanho) {
-                            mainActivity.addAreaLog("Arquivo \"" + novoNomeArquivo + "\" recebido com sucesso.");
+                            mainActivity.addAreaLog(mainActivity.getString(R.string.arquivo_recebido, novoNomeArquivo));
                         } else {
-                            mainActivity.addAreaLog("Arquivo \"" + novoNomeArquivo + "\" corrompido durante o recebimento.");
-                            mainActivity.exibirMensagem("Erro: Conexão com o servidor perdida.");
+                            mainActivity.addAreaLog(mainActivity.getString(R.string.arquivo_recebido_corrompido, novoNomeArquivo));
+                            mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_conexao_perdida));
                             desconectar();
                         }
-                    } catch (IOException e) {
+                    } catch (IOException ex) {
                         if (conectado && !enviandoArquivos()) {
-                            mainActivity.exibirMensagem("Erro: Conexão com o servidor perdida.");
+                            mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_conexao_perdida));
                             desconectar();
-                            e.printStackTrace();
+                            ex.printStackTrace();
                         }
                     } finally {
                         try {
                             if (out != null) {
                                 out.close();
                             }
-                            if (in != null) {
-                                in.close();
+                            if (is != null) {
+                                is.close();
                             }
                             if (dis != null) {
                                 dis.close();
@@ -223,8 +225,8 @@ public class Cliente {
                             if (socket != null) {
                                 socket.close();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
                         } finally {
                             mainActivity.setStatusProgress(0);
                             mainActivity.setStatus("");
@@ -238,7 +240,7 @@ public class Cliente {
 
     private class EnviarArquivos implements Runnable {
 
-        private ArrayList<Arquivo> arquivos = null;
+        private final ArrayList<Arquivo> arquivos;
 
         public EnviarArquivos(ArrayList<Arquivo> arquivos) {
             this.arquivos = arquivos;
@@ -253,70 +255,68 @@ public class Cliente {
                     esperar(AGUARDAR_APOS_ENVIO);
                 }
                 if (loop == AGUARDAR_APOS_ENVIO_LOOP) {
-                    mainActivity.exibirMensagem("Não foi possível enviar os arquivos restantes.");
+                    mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_nao_possivel_enviar));
                     break;
                 }
-                if (arquivo.getArquivo().exists()) {
-                    DataOutputStream dos = null;
-                    FileInputStream fis = null;
-                    OutputStream out = null;
+                InputStream is = null;
+                DataOutputStream dos = null;
+                OutputStream out = null;
+                try {
+                    is = arquivo.getInputStream();
+                    dos = new DataOutputStream(socket.getOutputStream());
+                    dos.writeUTF(arquivo.getName() + "|" + arquivo.getSize());
+                    esperar(1000);
+                    out = socket.getOutputStream();
+                    mainActivity.permanecerAcordado(true);
+                    mainActivity.setStatus(mainActivity.getString(R.string.status_enviando_arquivo));
+                    mainActivity.addAreaLog(mainActivity.getString(R.string.enviando_arquivo, arquivo.getName()));
+                    byte[] buffer = new byte[1024];
+                    long bytesEnviados = 0;
+                    int count;
+                    long tamanhokb = (arquivo.getSize() / 1024);
+                    tamanhokb = (tamanhokb == 0 ? 1 : tamanhokb);
+                    long kb = 0;
+                    int progresso;
+                    while ((count = is.read(buffer)) > 0) {
+                        out.write(buffer, 0, count);
+                        bytesEnviados += count;
+                        progresso = (int) (++kb * 100 / tamanhokb);
+                        mainActivity.setStatusProgress(progresso < 100 ? progresso : 100);
+                    }
+                    if (bytesEnviados == arquivo.getSize()) {
+                        mainActivity.addAreaLog(mainActivity.getString(R.string.arquivo_enviado, arquivo.getName()));
+                    } else {
+                        mainActivity.addAreaLog(mainActivity.getString(R.string.arquivo_enviado_corrompido, arquivo.getName()));
+                    }
+                } catch (FileNotFoundException ex) {
+                    mainActivity.addAreaLog(mainActivity.getString(R.string.arquivo_nao_encontrado, arquivo.getName()));
+                } catch (IOException ex) {
+                    if (conectado) {
+                        mainActivity.exibirMensagem(mainActivity.getString(R.string.erro_conexao_perdida));
+                        desconectar();
+                        ex.printStackTrace();
+                    }
+                } finally {
                     try {
-                        dos = new DataOutputStream(socket.getOutputStream());
-                        dos.writeUTF(arquivo.getArquivo().getName() + "|" + arquivo.getArquivo().length());
-                        esperar(1000);
-                        fis = new FileInputStream(arquivo.getArquivo());
-                        out = socket.getOutputStream();
-                        mainActivity.permanecerAcordado(true);
-                        mainActivity.setStatus("Enviando Arquivo");
-                        mainActivity.addAreaLog("Enviando Arquivo: \"" + arquivo.getArquivo().getName() + "\".");
-                        byte[] buffer = new byte[1024];
-                        long bytesEnviados = 0;
-                        int count;
-                        long tamanhokb = (arquivo.getArquivo().length() / 1024);
-                        tamanhokb = (tamanhokb == 0 ? 1 : tamanhokb);
-                        long kb = 0;
-                        int progresso;
-                        while ((count = fis.read(buffer)) > 0) {
-                            out.write(buffer, 0, count);
-                            bytesEnviados += count;
-                            progresso = (int) (++kb * 100 / tamanhokb);
-                            mainActivity.setStatusProgress(progresso < 100 ? progresso : 100);
-                        }
-                        if (bytesEnviados == arquivo.getArquivo().length()) {
-                            mainActivity.addAreaLog("Arquivo \"" + arquivo.getArquivo().getName() + "\" enviado com sucesso.");
-                        } else {
-                            mainActivity.addAreaLog("Arquivo \"" + arquivo.getArquivo().getName() + "\" corrompido durante o envio.");
-                        }
-                    } catch (IOException e) {
-                        if (conectado) {
-                            mainActivity.exibirMensagem("Erro: Conexão com o servidor perdida.");
-                            desconectar();
-                            e.printStackTrace();
-                        }
-                    } finally {
-                        try {
+                        if (is != null) {
                             if (out != null) {
                                 out.close();
                             }
-                            if (fis != null) {
-                                fis.close();
-                            }
+                            is.close();
                             if (dos != null) {
                                 dos.close();
                             }
                             if (socket != null) {
                                 socket.close();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            mainActivity.setStatus("");
-                            mainActivity.setStatusProgress(0);
-                            mainActivity.permanecerAcordado(false);
                         }
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    } finally {
+                        mainActivity.setStatus("");
+                        mainActivity.setStatusProgress(0);
+                        mainActivity.permanecerAcordado(false);
                     }
-                } else {
-                    mainActivity.addAreaLog("Arquivo: \"" + arquivo.getArquivo().getName() + "\" não foi encontrado.");
                 }
                 esperar(AGUARDAR_APOS_ENVIO);
             }

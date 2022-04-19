@@ -23,8 +23,6 @@ package br.com.iagocolodetti.transferirarquivo.exception;
  */
 public class ClienteConectarException extends Exception {
 
-    private int code;
-
     public ClienteConectarException() {
         super("Não foi possível conectar-se ao servidor.");
     }

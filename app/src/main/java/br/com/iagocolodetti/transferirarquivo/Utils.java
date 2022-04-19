@@ -17,6 +17,7 @@
  */
 package br.com.iagocolodetti.transferirarquivo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.ArrayAdapter;
 
@@ -24,8 +25,9 @@ import android.widget.ArrayAdapter;
  *
  * @author iagocolodetti
  */
-public class Util {
+public class Utils {
 
+    @SuppressLint("DefaultLocale")
     public static String calcularTamanho(String tipo, long tamanhoArquivo) {
         String tamanho = "";
             switch (tipo) {
@@ -49,8 +51,8 @@ public class Util {
     }
 
     public static ArrayAdapter<String> getSpinnerAdapter(Context context) {
-        String spinnerItens[] = new String[]{"B", "KB", "MB", "GB", "TB"};
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(context, R.layout.spinner_textstyle, spinnerItens);
+        String[] spinnerItens = new String[]{"B", "KB", "MB", "GB", "TB"};
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(context, R.layout.spinner_textstyle, spinnerItens);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return dataAdapter;
     }

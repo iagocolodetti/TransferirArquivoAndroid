@@ -17,8 +17,13 @@
  */
 package br.com.iagocolodetti.transferirarquivo;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
@@ -34,10 +39,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nbsp.materialfilepicker.MaterialFilePicker;
-import com.nbsp.materialfilepicker.ui.FilePickerActivity;
-
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -46,47 +48,27 @@ import java.util.ArrayList;
  */
 public class AddArquivosActivity extends AppCompatActivity {
 
-    private final int REQUEST_CODE_SELECIONAR_ARQUIVO = 1000;
-
-    private File arquivo = null;
     private ArrayList<Arquivo> arquivos = null;
     private long tamanhoTotal = 0;
     private int selecionadoParaRemover = -1;
 
-    private EditText addEtArquivo, addEtTamanho, addEtTamanhoTotal;
-    private Spinner addSprTamanho, addSprTamanhoTotal;
+    private EditText addEtTamanhoTotal;
+    private Spinner addSprTamanhoTotal;
     private ListView addLvArquivos;
     private Button addBtRemover;
 
     // <editor-fold defaultstate="collapsed" desc="Métodos">
     private void exibirMensagem(final String mensagem) {
-        Toast.makeText(AddArquivosActivity.this, mensagem, Toast.LENGTH_SHORT).show();
-    }
-
-    private void adicionarArquivo() {
-        if (arquivo != null) {
-            Arquivo _arquivo = new Arquivo(arquivo);
-            if (!arquivos.contains(_arquivo)) {
-                arquivos.add(_arquivo);
-                atualizarLvArquivos();
-                tamanhoTotal += arquivo.length();
-                addEtArquivo.setText("");
-                addEtTamanho.setText("");
-                addEtTamanhoTotal.setText(Util.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
-                arquivo = null;
-            } else {
-                exibirMensagem("Erro: Esse arquivo já foi adicionado à lista.");
-            }
-        }
+        Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show();
     }
 
     private void removerArquivo() {
         if (selecionadoParaRemover != -1) {
-            tamanhoTotal -= arquivos.get(selecionadoParaRemover).getArquivo().length();
+            tamanhoTotal -= arquivos.get(selecionadoParaRemover).getSize();
             arquivos.remove(selecionadoParaRemover);
-            addBtRemover.setText("Remover");
+            addBtRemover.setText(getString(R.string.add_bt_remover));
             atualizarLvArquivos();
-            addEtTamanhoTotal.setText(Util.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
+            addEtTamanhoTotal.setText(Utils.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
             selecionadoParaRemover = -1;
         }
     }
@@ -100,13 +82,13 @@ public class AddArquivosActivity extends AppCompatActivity {
 
     private void atualizarLvArquivos() {
         final String tipo = addSprTamanhoTotal.getSelectedItem().toString();
-        ArrayAdapter<Arquivo> adapter = new ArrayAdapter<Arquivo>(AddArquivosActivity.this, R.layout.custom_listview, arquivos) {
+        ArrayAdapter<Arquivo> adapter = new ArrayAdapter<Arquivo>(this, R.layout.custom_listview, arquivos) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
                 TextView text1 = view.findViewById(android.R.id.text1);
-                Spanned texto = Html.fromHtml("<normal><font color=\"#FF0000\">[" + position + "]</font><font color=\"#FBFBFB\"> " + arquivos.get(position).getArquivo().getName() + "</font></normal>"
-                        + "<br><small><font color=\"#C7E4E6\">Tamanho: " + Util.calcularTamanho(tipo, arquivos.get(position).getArquivo().length()) + " " + tipo + "</font>");
+                Spanned texto = Html.fromHtml("<normal><font color=\"#FF0000\">[" + position + "]</font><font color=\"#FBFBFB\"> " + arquivos.get(position).getName() + "</font></normal>"
+                        + "<br><small><font color=\"#C7E4E6\">Tamanho: " + Utils.calcularTamanho(tipo, arquivos.get(position).getSize()) + " " + tipo + "</font>", Html.FROM_HTML_MODE_LEGACY);
                 text1.setText(texto);
                 return view;
             }
@@ -120,11 +102,7 @@ public class AddArquivosActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_arquivos);
 
-        addEtArquivo = findViewById(R.id.addEtArquivo);
-        addEtTamanho = findViewById(R.id.addEtTamanho);
-        addSprTamanho = findViewById(R.id.addSprTamanho);
         Button addBtSelecionar = findViewById(R.id.addBtSelecionar);
-        Button addBtAdicionar = findViewById(R.id.addBtAdicionar);
         addLvArquivos = findViewById(R.id.addLvArquivos);
         addBtRemover = findViewById(R.id.addBtRemover);
         Button addBtRemoverTodos = findViewById(R.id.addBtRemoverTodos);
@@ -133,111 +111,62 @@ public class AddArquivosActivity extends AppCompatActivity {
         Button addBtConfirmar = findViewById(R.id.addBtConfirmar);
         Button addBtCancelar = findViewById(R.id.addBtCancelar);
 
-        addEtArquivo.setInputType(InputType.TYPE_NULL);
-        addEtTamanho.setInputType(InputType.TYPE_NULL);
         addEtTamanhoTotal.setInputType(InputType.TYPE_NULL);
 
-        Intent intent = getIntent();
-        arquivos = (ArrayList<Arquivo>) intent.getSerializableExtra("arquivos");
-        tamanhoTotal = intent.getLongExtra("tamanhoTotal", 0);
+        arquivos = new ArrayList<>(ArquivoHelper.getArquivos());
+        tamanhoTotal = ArquivoHelper.getTamanhoTotal();
+        ArquivoHelper.clear();
 
-        addSprTamanho.setAdapter(Util.getSpinnerAdapter(this));
-        addSprTamanho.setSelection(0);
-        addSprTamanho.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (arquivo != null) {
-                    addEtTamanho.setText(Util.calcularTamanho(addSprTamanho.getSelectedItem().toString(), arquivo.length()));
-                }
-            }
+        addBtSelecionar.setOnClickListener(view -> {
+            Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
+            chooseFile.setType("*/*");
+            chooseFile.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            chooseFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            chooseFile.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            selecionarArquivos.launch(Intent.createChooser(chooseFile, getString(R.string.titulo_selecionar_arquivos)));
+        });
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
+        addLvArquivos.setOnItemClickListener((parent, view, position, id) -> {
+            if (selecionadoParaRemover != position) {
+                selecionadoParaRemover = position;
+                addBtRemover.setText(getString(R.string.add_bt_remover_com_id, selecionadoParaRemover));
+            } else {
+                selecionadoParaRemover = -1;
+                addBtRemover.setText(getString(R.string.add_bt_remover));
             }
         });
 
-        addBtSelecionar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new MaterialFilePicker()
-                    .withActivity(AddArquivosActivity.this)
-                    .withRequestCode(REQUEST_CODE_SELECIONAR_ARQUIVO)
-                    .withFilterDirectories(true)
-                    .withHiddenFiles(true)
-                    .start();
-            }
-        });
+        addBtRemoverTodos.setOnClickListener(view -> removerTodosArquivos());
 
-        addBtAdicionar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                adicionarArquivo();
-            }
-        });
+        addBtRemover.setOnClickListener(view -> removerArquivo());
 
-        addLvArquivos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (selecionadoParaRemover != position) {
-                    selecionadoParaRemover = position;
-                    addBtRemover.setText("Remover [" + selecionadoParaRemover + "]");
-                } else {
-                    selecionadoParaRemover = -1;
-                    addBtRemover.setText("Remover");
-                }
-            }
-        });
-
-        addBtRemover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removerArquivo();
-            }
-        });
-
-        addBtRemoverTodos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                removerTodosArquivos();
-            }
-        });
-
-        addSprTamanhoTotal.setAdapter(Util.getSpinnerAdapter(this));
+        addSprTamanhoTotal.setAdapter(Utils.getSpinnerAdapter(this));
         addSprTamanhoTotal.setSelection(0);
         addSprTamanhoTotal.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (arquivos != null && !arquivos.isEmpty()) {
                     atualizarLvArquivos();
-                    addEtTamanhoTotal.setText(Util.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
+                    addEtTamanhoTotal.setText(Utils.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
                 }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
             }
         });
 
-        addBtConfirmar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (arquivos.size() > 1) {
-                    Intent intent = new Intent();
-                    intent.putExtra("arquivos", arquivos);
-                    intent.putExtra("tamanhoTotal", tamanhoTotal);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    exibirMensagem("Erro: Adicione pelo menos 2 (dois) arquivos.");
-                }
-            }
-        });
+        addBtCancelar.setOnClickListener(view -> finish());
 
-        addBtCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        addBtConfirmar.setOnClickListener(view -> {
+            if (arquivos.size() > 1) {
+                ArquivoHelper.setArquivos(arquivos);
+                ArquivoHelper.setTamanhoTotal(tamanhoTotal);
+                setResult(RESULT_OK);
                 finish();
+            } else {
+                exibirMensagem(getString(R.string.erro_confirmar_arquivos));
             }
         });
     }
@@ -247,16 +176,53 @@ public class AddArquivosActivity extends AppCompatActivity {
         super.onResume();
         if (arquivos != null && !arquivos.isEmpty()) {
             atualizarLvArquivos();
-            addEtTamanhoTotal.setText(Util.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
+            addEtTamanhoTotal.setText(Utils.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
         }
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_SELECIONAR_ARQUIVO && resultCode == RESULT_OK) {
-            arquivo = new File(data.getStringExtra(FilePickerActivity.RESULT_FILE_PATH));
-            addEtArquivo.setText(arquivo.getName());
-            addEtTamanho.setText(Util.calcularTamanho(addSprTamanho.getSelectedItem().toString(), arquivo.length()));
+    ActivityResultLauncher<Intent> selecionarArquivos = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent intent = result.getData();
+                if (intent != null) {
+                    try {
+                        Uri uri;
+                        int erros = 0;
+                        if (intent.getClipData() != null) {
+                            for (int i = 0; i < intent.getClipData().getItemCount(); i++) {
+                                uri = intent.getClipData().getItemAt(i).getUri();
+                                getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                Arquivo arquivo = new Arquivo(this, uri);
+                                if (!arquivos.contains(arquivo)) {
+                                    arquivos.add(arquivo);
+                                    tamanhoTotal += arquivo.getSize();
+                                } else {
+                                    erros++;
+                                }
+                            }
+                            atualizarLvArquivos();
+                            addEtTamanhoTotal.setText(Utils.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
+                            if (erros > 0) {
+                                exibirMensagem(getResources().getQuantityString(R.plurals.erro_selecionar_arquivos_ja_adicionados, erros));
+                            }
+                        } else {
+                            uri = intent.getData();
+                            getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            Arquivo arquivo = new Arquivo(this, uri);
+                            if (!arquivos.contains(arquivo)) {
+                                arquivos.add(arquivo);
+                                atualizarLvArquivos();
+                                tamanhoTotal += arquivo.getSize();
+                                addEtTamanhoTotal.setText(Utils.calcularTamanho(addSprTamanhoTotal.getSelectedItem().toString(), tamanhoTotal));
+                            } else {
+                                exibirMensagem(getString(R.string.erro_selecionar_arquivos_ja_adicionado));
+                            }
+                        }
+                    } catch (FileNotFoundException ex) {
+                        exibirMensagem(getString(R.string.erro_selecionar_arquivos));
+                    }
+                }
+            }
         }
-    }
+    );
 }
