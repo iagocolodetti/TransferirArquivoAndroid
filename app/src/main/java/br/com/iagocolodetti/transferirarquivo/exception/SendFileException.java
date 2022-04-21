@@ -21,13 +21,13 @@ package br.com.iagocolodetti.transferirarquivo.exception;
  *
  * @author iagocolodetti
  */
-public class ClienteConectarException extends Exception {
+public class SendFileException extends Exception {
 
-    public ClienteConectarException() {
-        super("Não foi possível conectar-se ao servidor.");
+    public SendFileException() {
+        super("Não foi possível enviar o arquivo.");
     }
 
-    public ClienteConectarException(String msg) {
-        super(msg);
+    public SendFileException(String message) {
+        super(message);
     }
 }

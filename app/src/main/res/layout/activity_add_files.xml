@@ -6,7 +6,7 @@
     android:background="#303030"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    tools:context=".AddArquivosActivity">
+    tools:context=".AddFilesActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -22,19 +22,19 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/addBtSelecionar"
+            android:id="@+id/addBtnSelect"
             android:layout_width="180dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:background="@drawable/btacende"
-            android:text="@string/bt_selecionar"
+            android:background="@drawable/mybutton"
+            android:text="@string/btn_select"
             android:textSize="16sp"
             tools:ignore="InefficientWeight,TextContrastCheck,TouchTargetSizeCheck" />
     </LinearLayout>
 
     <ListView
-        android:id="@+id/addLvArquivos"
+        android:id="@+id/addLvwFiles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/linearLayout2"
@@ -69,12 +69,12 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/addBtRemoverTodos"
+                android:id="@+id/addBtnRemoveAll"
                 android:layout_width="170dp"
                 android:layout_height="35dp"
                 android:layout_weight="0.4"
-                android:background="@drawable/btacende"
-                android:text="@string/add_bt_remover_todos"
+                android:background="@drawable/mybutton"
+                android:text="@string/add_btn_remove_all"
                 android:textSize="16sp"
                 tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
 
@@ -84,12 +84,12 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/addBtRemover"
+                android:id="@+id/addBtnRemove"
                 android:layout_width="170dp"
                 android:layout_height="35dp"
                 android:layout_weight="0.4"
-                android:background="@drawable/btacende"
-                android:text="@string/add_bt_remover"
+                android:background="@drawable/mybutton"
+                android:text="@string/add_btn_remove"
                 android:textSize="16sp"
                 tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
         </LinearLayout>
@@ -101,38 +101,38 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/addTvTamanhoTotal"
+                android:id="@+id/addTxvTotalSize"
                 android:layout_width="130dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
-                android:text="@string/add_tv_tamanho_total"
+                android:text="@string/add_txv_total_size"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/addEtTamanhoTotal"
+                android:id="@+id/addEtxTotalSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.6"
                 android:ems="10"
-                android:hint="@string/add_et_tamanho_total_hint"
+                android:hint="@string/add_etx_total_size_hint"
                 android:textColorHint="@color/hintColor"
                 android:importantForAutofill="no"
                 android:inputType="none"
-                android:labelFor="@id/addTvTamanhoTotal"
+                android:labelFor="@id/addTxvTotalSize"
                 android:maxLines="1"
                 android:singleLine="true"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
-                tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
+                tools:ignore="DuplicateSpeakableTextCheck,TextFields,TouchTargetSizeCheck" />
 
             <Spinner
-                android:id="@+id/addSprTamanhoTotal"
+                android:id="@+id/addSprTotalSize"
                 android:layout_width="85dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
-                android:contentDescription="@string/add_spr_tamanho_total_description"
+                android:contentDescription="@string/add_spr_total_size_description"
                 tools:ignore="TouchTargetSizeCheck" />
         </LinearLayout>
 
@@ -143,12 +143,12 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/addBtCancelar"
+                android:id="@+id/addBtnCancel"
                 android:layout_width="90dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
-                android:background="@drawable/btacende"
-                android:text="@string/add_bt_cancelar"
+                android:background="@drawable/mybutton"
+                android:text="@string/add_btn_cancel"
                 android:textSize="16sp"
                 tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
 
@@ -158,12 +158,12 @@
                 android:layout_weight="2" />
 
             <Button
-                android:id="@+id/addBtConfirmar"
+                android:id="@+id/addBtnConfirm"
                 android:layout_width="90dp"
                 android:layout_height="35dp"
                 android:layout_weight="1"
-                android:background="@drawable/btacende"
-                android:text="@string/add_bt_confirmar"
+                android:background="@drawable/mybutton"
+                android:text="@string/add_btn_confirm"
                 android:textSize="16sp"
                 tools:ignore="TextContrastCheck,TouchTargetSizeCheck" />
         </LinearLayout>

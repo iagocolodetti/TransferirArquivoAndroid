@@ -28,31 +28,31 @@ import android.widget.ArrayAdapter;
 public class Utils {
 
     @SuppressLint("DefaultLocale")
-    public static String calcularTamanho(String tipo, long tamanhoArquivo) {
-        String tamanho = "";
-            switch (tipo) {
+    public static String bytesTo(long bytes, String bytesTo) {
+        String size = "";
+            switch (bytesTo) {
                 case "B":
-                    tamanho = String.valueOf(tamanhoArquivo);
+                    size = String.valueOf(bytes);
                     break;
                 case "KB":
-                    tamanho = String.valueOf(tamanhoArquivo / 1024);
+                    size = String.valueOf(bytes / 1024);
                     break;
                 case "MB":
-                    tamanho = String.valueOf(tamanhoArquivo / 1024 / 1024);
+                    size = String.valueOf(bytes / 1024 / 1024);
                     break;
                 case "GB":
-                    tamanho = String.format("%.2f", (double) tamanhoArquivo / 1024 / 1024 / 1024);
+                    size = String.format("%.2f", (double) bytes / 1024 / 1024 / 1024);
                     break;
                 case "TB":
-                    tamanho = String.format("%.2f", (double) tamanhoArquivo / 1024 / 1024 / 1024 / 1024);
+                    size = String.format("%.2f", (double) bytes / 1024 / 1024 / 1024 / 1024);
                     break;
             }
-        return tamanho;
+        return size;
     }
 
     public static ArrayAdapter<String> getSpinnerAdapter(Context context) {
-        String[] spinnerItens = new String[]{"B", "KB", "MB", "GB", "TB"};
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(context, R.layout.spinner_textstyle, spinnerItens);
+        String[] spinnerItems = new String[]{"B", "KB", "MB", "GB", "TB"};
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(context, R.layout.spinner_textstyle, spinnerItems);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return dataAdapter;
     }

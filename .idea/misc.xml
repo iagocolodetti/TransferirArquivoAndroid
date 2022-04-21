@@ -3,9 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/custom_checkbox.xml" value="0.331" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/custom_progressbar.xml" value="0.331" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/custom_scrollbar.xml" value="0.331" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/custom_scrollbar_area_log.xml" value="0.331" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/ic_launcher_background.xml" value="0.331" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/drawable/mybutton.xml" value="0.331" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout-land/activity_main.xml" value="0.303125" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout-port/activity_main.xml" value="0.19322916666666667" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout/activity_add_arquivos.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout/activity_add_files.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout/custom_listview.xml" value="0.18802083333333333" />
         <entry key="..\:/Users/iagov/Documents/AndroidStudioProjects/TransferirArquivoAndroid/app/src/main/res/layout/spinner_textstyle.xml" value="0.18802083333333333" />

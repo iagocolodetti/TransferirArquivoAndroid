@@ -3,91 +3,91 @@
     <string name="site">github.com/iagocolodetti/TransferirArquivoAndroid</string>
     <string name="site_url">https://github.com/iagocolodetti/TransferirArquivoAndroid</string>
 
-    <string name="erro_com_parametro">Erro: %s</string>
+    <string name="parameter_error">Erro: %s</string>
 
     <!-- [MainActivity / activity_main] -->
-    <string name="tv_ip">IP:</string>
-    <string name="et_ip_hint">IP do servidor</string>
-    <string name="tv_porta">Porta:</string>
-    <string name="et_porta_hint">Porta do servidor</string>
-    <string name="et_armazenamento">Local de Armazenamento</string>
-    <string name="rb_interno">Interno</string>
-    <string name="rb_externo">Externo</string>
-    <string name="bt_conectar">CONECTAR</string>
-    <string name="bt_conectar_conectando">CONECTANDO</string>
-    <string name="bt_conectar_desconectar">DESCONECTAR</string>
-    <string name="tv_arquivo">Arquivo:</string>
-    <string name="et_arquivo_varios">Vários</string>
-    <string name="et_arquivo_hint">Nome do arquivo</string>
-    <string name="tv_tamanho">Tamanho:</string>
-    <string name="et_tamanho_hint">Tamanho do arquivo</string>
-    <string name="spr_tamanho_description">Unidades de Tamanho</string>
-    <string name="bt_selecionar">Selecionar</string>
-    <string name="cb_lote">Lote</string>
-    <string name="bt_enviar">Enviar</string>
-    <string name="tv_status">Status:</string>
-    <string name="et_status_hint">Estado da conexão</string>
-    <string name="titulo_selecionar_arquivo">Escolha o arquivo</string>
-    <!-- Erros -->
-    <string name="erro_permissao_internet">Erro: É necessário conceder permissão de acesso a internet.</string>
-    <string name="erro_permissao_armazenamento">Erro: É necessário conceder permissão de acesso ao armazenamento.</string>
-    <string name="erro_porta_nao_definida">Erro: Defina o número da porta.</string>
-    <string name="erro_porta_nao_inteiro">Erro: A porta deve ser definida com número inteiro.</string>
-    <string name="erro_ainda_enviando_arquivo">Erro: Você ainda está enviando arquivos, aguarde o termino da operação atual.</string>
-    <string name="erro_nao_conectado">Erro: Conecte-se a um servidor.</string>
-    <string name="erro_selecionar_arquivo">Erro: Não foi possível selecionar o arquivo.</string>
-    <string name="erro_cartao_sd">Erro: Não foi possível encontrar o cartão de memória.</string>
+    <string name="txv_ip">IP:</string>
+    <string name="etx_ip_hint">IP do servidor</string>
+    <string name="txv_port">Porta:</string>
+    <string name="etx_port_hint">Porta do servidor</string>
+    <string name="etx_storage">Local de Armazenamento</string>
+    <string name="rdo_internal">Interno</string>
+    <string name="rdo_external">Externo</string>
+    <string name="btn_connect">CONECTAR</string>
+    <string name="btn_connect_connecting">CONECTANDO</string>
+    <string name="btn_connect_disconnect">DESCONECTAR</string>
+    <string name="txv_file">Arquivo:</string>
+    <string name="etx_file_various">Vários</string>
+    <string name="etx_file_hint">Nome do arquivo</string>
+    <string name="txv_size">Tamanho:</string>
+    <string name="etx_size_hint">Tamanho do arquivo</string>
+    <string name="spr_size_description">Unidades de Bytes</string>
+    <string name="btn_select">Selecionar</string>
+    <string name="chk_batch">Lote</string>
+    <string name="btn_send">Enviar</string>
+    <string name="txv_status">Status:</string>
+    <string name="etx_status_hint">Estado da conexão</string>
+    <string name="select_file_title">Escolha o arquivo</string>
+    <!-- Errors -->
+    <string name="internet_permission_error">Erro: É necessário conceder permissão de acesso a internet.</string>
+    <string name="storage_permission_error">Erro: É necessário conceder permissão de acesso ao armazenamento.</string>
+    <string name="port_not_defined_error">Erro: Defina o número da porta.</string>
+    <string name="port_not_integer_error">Erro: A porta deve ser definida com número inteiro.</string>
+    <string name="still_sending_file_error">Erro: Você ainda está enviando arquivos, aguarde o termino da operação atual.</string>
+    <string name="not_connected_error">Erro: Conecte-se a um servidor.</string>
+    <string name="select_file_error">Erro: Não foi possível selecionar o arquivo.</string>
+    <string name="sdcard_error">Erro: Não foi possível encontrar o cartão de memória.</string>
     <!-- [MainActivity / activity_main] -->
 
-    <!-- [AddArquivosActivity / activity_add_arquivos] -->
-    <string name="add_bt_selecionar">Selecionar</string>
-    <string name="add_bt_remover">Remover</string>
-    <string name="add_bt_remover_com_id">Remover [%d]</string>
-    <string name="add_bt_remover_todos">Remover Todos</string>
-    <string name="add_tv_tamanho_total">Tamanho Total:</string>
-    <string name="add_et_tamanho_total_hint">Tamanho total dos arquivos</string>
-    <string name="add_spr_tamanho_total_description">Unidades de Tamanho</string>
-    <string name="add_bt_cancelar">Cancelar</string>
-    <string name="add_bt_confirmar">Confirmar</string>
-    <string name="titulo_selecionar_arquivos">Escolha o(s) arquivo(s)</string>
-    <!-- Erros -->
-    <string name="erro_selecionar_arquivos">Erro: Não foi possível selecionar o(s) arquivo(s).</string>
-    <string name="erro_confirmar_arquivos">Erro: Adicione pelo menos 2 (dois) arquivos.</string>
-    <string name="erro_selecionar_arquivos_ja_adicionado">Erro: Esse arquivo já foi adicionado à lista.</string>
-    <plurals name="erro_selecionar_arquivos_ja_adicionados">
+    <!-- [AddFilesActivity / activity_add_files] -->
+    <string name="add_btn_select">Selecionar</string>
+    <string name="add_btn_remove">Remover</string>
+    <string name="add_btn_remove_id">Remover [%d]</string>
+    <string name="add_btn_remove_all">Remover Todos</string>
+    <string name="add_txv_total_size">Tamanho Total:</string>
+    <string name="add_etx_total_size_hint">Tamanho dos arquivos</string>
+    <string name="add_spr_total_size_description">Unidades de Tamanho</string>
+    <string name="add_btn_cancel">Cancelar</string>
+    <string name="add_btn_confirm">Confirmar</string>
+    <string name="select_files_title">Escolha o(s) arquivo(s)</string>
+    <!-- Errors -->
+    <string name="select_files_error">Erro: Não foi possível selecionar o(s) arquivo(s).</string>
+    <string name="confirm_files_error">Erro: Adicione pelo menos 2 (dois) arquivos.</string>
+    <string name="select_files_already_added_error">Erro: Esse arquivo já foi adicionado à lista.</string>
+    <plurals name="select_files_already_added_errors">
         <item quantity="one">Erro: Algum arquivo já foi adicionado à lista.</item>
         <item quantity="other">Erro: Alguns arquivos já foram adicionados à lista.</item>
     </plurals>
-    <!-- [AddArquivosActivity / activity_add_arquivos] -->
+    <!-- [AddFilesActivity / activity_add_files] -->
 
-    <!-- [Cliente] -->
-    <string name="status_recebendo_arquivo">Recebendo Arquivo</string>
-    <string name="recebendo_arquivo">Recebendo Arquivo: \"%s\".</string>
-    <string name="arquivo_recebido">Arquivo \"%s\" recebido com sucesso."</string>
-    <string name="arquivo_recebido_corrompido">Arquivo \"%s\" corrompido durante o recebimento.</string>
-    <string name="status_enviando_arquivo">Enviando Arquivo</string>
-    <string name="enviando_arquivo">Enviando Arquivo: \"%s\".</string>
-    <string name="arquivo_enviado">Arquivo \"%s\" enviado com sucesso.</string>
-    <string name="arquivo_enviado_corrompido">Arquivo \"%s\" corrompido durante o envio.</string>
-    <string name="arquivo_nao_encontrado">Arquivo: \"%s\" não foi encontrado.</string>
-    <!-- Erros -->
-    <string name="erro_ip_invalido">Digite um IP válido.</string>
-    <string name="erro_ip_nao_definido">Entre com o IP do servidor.</string>
-    <string name="erro_porta_fora_do_limite">A porta deve ser no mínimo %d1 e no máximo %d2.</string>
-    <string name="erro_diretorio">Não foi possível usar o diretório selecionado.</string>
-    <string name="erro_enviar_nao_conectado">É necessário estar conectado a um servidor para enviar arquivos.</string>
-    <string name="erro_enviar_sem_arquivo">Selecione pelo menos um arquivo para enviar.</string>
-    <string name="erro_enviar_ja_transferindo">Uma transferência já está em andamento.</string>
-    <string name="erro_ip_porta_incorreto">Erro: IP e/ou porta incorreto(s).</string>
-    <string name="erro_nao_possivel_conectar">Erro: Não foi possível conectar-se a esse servidor.</string>
-    <string name="erro_nao_possivel_enviar">Não foi possível enviar os arquivos restantes.</string>
-    <string name="erro_conexao_perdida">Erro: Conexão com o servidor perdida.</string>
-    <!-- [Cliente] -->
+    <!-- [Client] -->
+    <string name="status_receiving_file">Recebendo Arquivo</string>
+    <string name="receiving_file">Recebendo Arquivo: \"%s\".</string>
+    <string name="file_received">Arquivo \"%s\" recebido com sucesso."</string>
+    <string name="received_file_corrupted">Arquivo \"%s\" corrompido durante o recebimento.</string>
+    <string name="status_sending_file">Enviando Arquivo</string>
+    <string name="sending_file">Enviando Arquivo: \"%s\".</string>
+    <string name="file_sended">Arquivo \"%s\" enviado com sucesso.</string>
+    <string name="sended_file_corrupted">Arquivo \"%s\" corrompido durante o envio.</string>
+    <string name="file_not_found">Arquivo: \"%s\" não foi encontrado.</string>
+    <!-- Errors -->
+    <string name="invalid_ip_error">Digite um IP válido.</string>
+    <string name="ip_not_defined_error">Entre com o IP do servidor.</string>
+    <string name="port_limit_error">A porta deve ser no mínimo %d1 e no máximo %d2.</string>
+    <string name="dir_error">Não foi possível usar o diretório selecionado.</string>
+    <string name="not_connected_to_send_error">É necessário estar conectado a um servidor para enviar arquivo.</string>
+    <string name="file_not_found_send_error">Selecione pelo menos um arquivo para enviar.</string>
+    <string name="already_sending_error">Uma transferência já está em andamento.</string>
+    <string name="incorrect_ip_port_error">Erro: IP e/ou porta incorreto(s).</string>
+    <string name="not_possible_connect_error">Erro: Não foi possível conectar-se a esse servidor.</string>
+    <string name="not_possible_send_error">Não foi possível enviar os arquivos restantes.</string>
+    <string name="lost_connection_error">Erro: Conexão com o servidor perdida.</string>
+    <!-- [Client] -->
 
-    <!-- [FileUtils] -->
-    <!-- Erros -->
-    <string name="erro_arquivo_nao_encontrado">Erro: Não foi possível encontrar o arquivo.</string>
-    <string name="erro_arquivo_nome">Erro: Não foi possível obter o nome do arquivo.</string>
-    <string name="erro_arquivo_tamanho">Erro: Não foi possível obter o tamanho do arquivo.</string>
-    <!-- [FileUtils] -->
+    <!-- [MyFile] -->
+    <!-- Errors -->
+    <string name="file_not_found_error">Erro: Não foi possível encontrar o arquivo.</string>
+    <string name="file_name_error">Erro: Não foi possível obter o nome do arquivo.</string>
+    <string name="file_size_error">Erro: Não foi possível obter o tamanho do arquivo.</string>
+    <!-- [MyFile] -->
 </resources>

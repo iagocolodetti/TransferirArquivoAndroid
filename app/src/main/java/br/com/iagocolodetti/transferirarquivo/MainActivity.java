@@ -55,13 +55,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import br.com.iagocolodetti.transferirarquivo.exception.ClienteConectarException;
-import br.com.iagocolodetti.transferirarquivo.exception.EnviarArquivoException;
+import br.com.iagocolodetti.transferirarquivo.exception.ClientConnectException;
+import br.com.iagocolodetti.transferirarquivo.exception.SendFileException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,100 +68,91 @@ public class MainActivity extends AppCompatActivity {
     private final int REQUEST_CODE_READ_EXTERNAL_STORAGE = 1002;
     private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1003;
 
-    private Cliente cliente = null;
+    private Client client = null;
 
-    private ArrayList<Arquivo> arquivos = null;
-    private long tamanhoTotal = 0;
+    private ArrayList<MyFile> myFiles = null;
+    private long totalSize = 0;
 
-    private EditText etIP, etPorta, etArmazenamento, etArquivo, etTamanho, etStatus;
-    private TextView tvProgresso, tvAreaLog;
-    private RadioButton rbInterno, rbExterno;
-    private Button btConectar;
-    private CheckBox cbLote;
-    private Spinner sprTamanho;
-    private ProgressBar pbStatus;
-    private ScrollView svAreaLog;
+    private EditText etxIP, etxPort, etxStorage, etxFile, etxSize, etxStatus;
+    private TextView txvProgress, txvAreaLog;
+    private RadioButton rdoInternal, rdoExternal;
+    private Button btnConnect;
+    private CheckBox chkBatch;
+    private Spinner sprSize;
+    private ProgressBar prgStatus;
+    private ScrollView scvAreaLog;
 
     // <editor-fold defaultstate="collapsed" desc="Métodos">
-    public void exibirMensagem(final String mensagem) {
-        this.runOnUiThread(() -> Toast.makeText(this, mensagem, Toast.LENGTH_SHORT).show());
+    public void showMessage(final String message) {
+        this.runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
     }
 
     @SuppressLint("SimpleDateFormat")
-    public void addAreaLog(final String mensagem) {
+    public void addAreaLog(final String message) {
         this.runOnUiThread(() -> {
-            tvAreaLog.append((tvAreaLog.getText().toString().isEmpty() ? "" : "\n") + String.format("[%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), mensagem));
-            svAreaLog.postDelayed(() -> svAreaLog.fullScroll(View.FOCUS_DOWN), 100);
+            txvAreaLog.append((txvAreaLog.getText().toString().isEmpty() ? "" : "\n") + String.format("[%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), message));
+            scvAreaLog.postDelayed(() -> scvAreaLog.fullScroll(View.FOCUS_DOWN), 100);
         });
     }
 
-    private void conectar() {
+    private void connect() {
         hideSoftKeyboard(this);
-        if (!etPorta.getText().toString().isEmpty()) {
-            int porta;
+        if (!etxPort.getText().toString().isEmpty()) {
+            int port;
             try {
-                porta = Integer.parseInt(etPorta.getText().toString());
-                cliente.conectar(etIP.getText().toString(), porta, getDiretorioSelecionado());
+                port = Integer.parseInt(etxPort.getText().toString());
+                client.connect(etxIP.getText().toString(), port, getSelectedDir());
             } catch (NumberFormatException ex) {
-                exibirMensagem(getString(R.string.erro_porta_nao_inteiro));
-            } catch (ClienteConectarException ex) {
-                exibirMensagem(getString(R.string.erro_com_parametro, ex.getMessage()));
+                showMessage(getString(R.string.port_not_integer_error));
+            } catch (ClientConnectException ex) {
+                showMessage(getString(R.string.parameter_error, ex.getMessage()));
             }
         } else {
-            exibirMensagem(getString(R.string.erro_porta_nao_definida));
+            showMessage(getString(R.string.port_not_defined_error));
         }
     }
 
-    public void conectando() {
+    public void connecting() {
         this.runOnUiThread(() -> {
-            btConectar.setText(getString(R.string.bt_conectar_conectando));
-            etIP.setInputType(InputType.TYPE_NULL);
-            etPorta.setInputType(InputType.TYPE_NULL);
-            rbInterno.setEnabled(false);
-            rbExterno.setEnabled(false);
+            btnConnect.setText(getString(R.string.btn_connect_connecting));
+            etxIP.setInputType(InputType.TYPE_NULL);
+            etxPort.setInputType(InputType.TYPE_NULL);
+            rdoInternal.setEnabled(false);
+            rdoExternal.setEnabled(false);
         });
     }
 
-    public void conectado() {
-        this.runOnUiThread(() -> btConectar.setText(getString(R.string.bt_conectar_desconectar)));
+    public void connected() {
+        this.runOnUiThread(() -> btnConnect.setText(getString(R.string.btn_connect_disconnect)));
     }
 
-    private void desconectar() {
-        cliente.desconectar();
+    private void disconnect() {
+        client.disconnect();
     }
 
-    public void desconectado() {
+    public void disconnected() {
         this.runOnUiThread(() -> {
-            etIP.setInputType(InputType.TYPE_CLASS_NUMBER);
-            etIP.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
-            etPorta.setInputType(InputType.TYPE_CLASS_NUMBER);
-            rbInterno.setEnabled(true);
-            rbExterno.setEnabled(true);
-            btConectar.setText(getString(R.string.bt_conectar));
+            etxIP.setInputType(InputType.TYPE_CLASS_NUMBER);
+            etxIP.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
+            etxPort.setInputType(InputType.TYPE_CLASS_NUMBER);
+            rdoInternal.setEnabled(true);
+            rdoExternal.setEnabled(true);
+            btnConnect.setText(getString(R.string.btn_connect));
         });
-    }
-
-    public void limparArquivos() {
-        this.runOnUiThread(() -> {
-            etArquivo.setText("");
-            etTamanho.setText("");
-        });
-        arquivos.clear();
-        tamanhoTotal = 0;
     }
 
     public void setStatus(final String status) {
-        this.runOnUiThread(() -> etStatus.setText(status));
+        this.runOnUiThread(() -> etxStatus.setText(status));
     }
 
     public void setStatusProgress(final int valor) {
         this.runOnUiThread(() -> {
-            pbStatus.setProgress(valor);
-            tvProgresso.setText((valor > 0 ? valor + "%" : ""));
+            prgStatus.setProgress(valor);
+            txvProgress.setText((valor > 0 ? valor + "%" : ""));
         });
     }
 
-    public void permanecerAcordado(final boolean state) {
+    public void keepScreenOn(final boolean state) {
         this.runOnUiThread(() -> {
             if (state) {
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -172,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private InputFilter[] filtroIP() {
+    private InputFilter[] ipFilter() {
         InputFilter[] filters = new InputFilter[1];
         filters[0] = (source, start, end, dest, dstart, dend) -> {
             if (end > start) {
@@ -231,56 +221,56 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setSubtitle(Html.fromHtml("<small><i><font color=\"#AAAAAA\">" + getString(R.string.site) + "</font></i></small><br>", Html.FROM_HTML_MODE_LEGACY));
         myToolbar.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.site_url)))));
 
-        cliente = new Cliente(this);
+        client = new Client(this);
 
-        arquivos = new ArrayList<>();
+        myFiles = new ArrayList<>();
 
-        etIP = findViewById(R.id.etIP);
-        etPorta = findViewById(R.id.etPorta);
-        etArmazenamento = findViewById(R.id.etArmazenamento);
-        rbInterno = findViewById(R.id.rbInterno);
-        rbExterno = findViewById(R.id.rbExterno);
-        btConectar = findViewById(R.id.btConectar);
+        etxIP = findViewById(R.id.etxIP);
+        etxPort = findViewById(R.id.etxPort);
+        etxStorage = findViewById(R.id.etxStorage);
+        rdoInternal = findViewById(R.id.rdoInternal);
+        rdoExternal = findViewById(R.id.rdoExternal);
+        btnConnect = findViewById(R.id.btnConnect);
 
-        etArquivo = findViewById(R.id.etArquivo);
-        etTamanho = findViewById(R.id.etTamanho);
-        sprTamanho = findViewById(R.id.sprTamanho);
-        Button btSelecionar = findViewById(R.id.btSelecionar);
-        cbLote = findViewById(R.id.cbLote);
-        Button btEnviar = findViewById(R.id.btEnviar);
+        etxFile = findViewById(R.id.etxFile);
+        etxSize = findViewById(R.id.etxSize);
+        sprSize = findViewById(R.id.sprSize);
+        Button btnSelect = findViewById(R.id.btnSelect);
+        chkBatch = findViewById(R.id.chkBatch);
+        Button btnSend = findViewById(R.id.btnSend);
 
-        etStatus = findViewById(R.id.etStatus);
-        pbStatus = findViewById(R.id.pbStatus);
-        tvProgresso = findViewById(R.id.tvProgresso);
+        etxStatus = findViewById(R.id.etxStatus);
+        prgStatus = findViewById(R.id.prgStatus);
+        txvProgress = findViewById(R.id.txvProgress);
 
-        tvAreaLog = findViewById(R.id.tvAreaLog);
-        svAreaLog = findViewById(R.id.svAreaLog);
+        txvAreaLog = findViewById(R.id.txvAreaLog);
+        scvAreaLog = findViewById(R.id.scvAreaLog);
 
-        etIP.setFilters(filtroIP());
-        etArmazenamento.setInputType(InputType.TYPE_NULL);
-        etArquivo.setInputType(InputType.TYPE_NULL);
-        etTamanho.setInputType(InputType.TYPE_NULL);
-        etStatus.setInputType(InputType.TYPE_NULL);
+        etxIP.setFilters(ipFilter());
+        etxStorage.setInputType(InputType.TYPE_NULL);
+        etxFile.setInputType(InputType.TYPE_NULL);
+        etxSize.setInputType(InputType.TYPE_NULL);
+        etxStatus.setInputType(InputType.TYPE_NULL);
 
-        rbInterno.setOnClickListener(view -> etArmazenamento.setText(getDiretorioSelecionado()));
+        rdoInternal.setOnClickListener(view -> etxStorage.setText(getSelectedDir()));
 
-        rbExterno.setOnClickListener(view -> etArmazenamento.setText(getDiretorioSelecionado()));
+        rdoExternal.setOnClickListener(view -> etxStorage.setText(getSelectedDir()));
 
-        btConectar.setOnClickListener(view -> {
-            if (btConectar.getText().equals(getString(R.string.bt_conectar))) {
-                conectar();
-            } else if (btConectar.getText().equals(getString(R.string.bt_conectar_desconectar)) || btConectar.getText().equals(getString(R.string.bt_conectar_conectando))) {
-                desconectar();
+        btnConnect.setOnClickListener(view -> {
+            if (btnConnect.getText().equals(getString(R.string.btn_connect))) {
+                connect();
+            } else if (btnConnect.getText().equals(getString(R.string.btn_connect_disconnect)) || btnConnect.getText().equals(getString(R.string.btn_connect_connecting))) {
+                disconnect();
             }
         });
 
-        sprTamanho.setAdapter(Utils.getSpinnerAdapter(this));
-        sprTamanho.setSelection(0);
-        sprTamanho.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        sprSize.setAdapter(Utils.getSpinnerAdapter(this));
+        sprSize.setSelection(0);
+        sprSize.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!arquivos.isEmpty()) {
-                    etTamanho.setText(Utils.calcularTamanho(sprTamanho.getSelectedItem().toString(), tamanhoTotal));
+                if (!myFiles.isEmpty()) {
+                    etxSize.setText(Utils.bytesTo(totalSize, sprSize.getSelectedItem().toString()));
                 }
             }
 
@@ -289,35 +279,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btSelecionar.setOnClickListener(view -> {
-            if (!cliente.enviandoArquivos()) {
-                if (!cbLote.isChecked()) {
+        btnSelect.setOnClickListener(view -> {
+            if (!client.sendingFiles()) {
+                if (!chkBatch.isChecked()) {
                     Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
                     chooseFile.setType("*/*");
                     chooseFile.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
                     chooseFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    selecionarArquivo.launch(Intent.createChooser(chooseFile, getString(R.string.titulo_selecionar_arquivo)));
+                    chooseFileResult.launch(Intent.createChooser(chooseFile, getString(R.string.select_file_title)));
                 } else {
-                    Intent intent = new Intent(this, AddArquivosActivity.class);
-                    ArquivoHelper.setArquivos(arquivos);
-                    ArquivoHelper.setTamanhoTotal(tamanhoTotal);
-                    addArquivo.launch(intent);
+                    Intent intent = new Intent(this, AddFilesActivity.class);
+                    MyFileHelper.setMyFiles(myFiles);
+                    MyFileHelper.setTotalSize(totalSize);
+                    addFilesResult.launch(intent);
                 }
             } else {
-                exibirMensagem(getString(R.string.erro_ainda_enviando_arquivo));
+                showMessage(getString(R.string.still_sending_file_error));
             }
         });
 
-        btEnviar.setOnClickListener(view -> {
-            if (btConectar.getText().equals(getString(R.string.bt_conectar_desconectar))) {
+        btnSend.setOnClickListener(view -> {
+            if (btnConnect.getText().equals(getString(R.string.btn_connect_disconnect))) {
                 try {
-                    cliente.enviarArquivos(arquivos);
-                } catch (EnviarArquivoException ex) {
-                    exibirMensagem(getString(R.string.erro_com_parametro, ex.getMessage()));
+                    client.sendFiles(myFiles);
+                } catch (SendFileException ex) {
+                    showMessage(getString(R.string.parameter_error, ex.getMessage()));
                 }
             } else {
-                exibirMensagem(getString(R.string.erro_nao_conectado));
+                showMessage(getString(R.string.not_connected_error));
             }
         });
     }
@@ -325,13 +315,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        restaurarPreferencias();
+        restorePreferences();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        salvarPreferencias();
+        savePreferences();
     }
 
     ActivityResultLauncher<Intent> storageAccessResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -339,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     if (!Environment.isExternalStorageManager()) {
-                        exibirMensagem(getString(R.string.erro_permissao_armazenamento));
+                        showMessage(getString(R.string.storage_permission_error));
                         finish();
                     }
                 }
@@ -347,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
         }
     );
 
-    ActivityResultLauncher<Intent> selecionarArquivo = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    ActivityResultLauncher<Intent> chooseFileResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent intent = result.getData();
@@ -355,28 +345,28 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         Uri uri = intent.getData();
                         getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        Arquivo arquivo = new Arquivo(this, uri);
-                        arquivos.clear();
-                        arquivos.add(arquivo);
-                        etArquivo.setText(arquivos.get(0).getName());
-                        tamanhoTotal = arquivos.get(0).getSize();
-                        etTamanho.setText(Utils.calcularTamanho(sprTamanho.getSelectedItem().toString(), tamanhoTotal));
+                        MyFile myFile = new MyFile(this, uri);
+                        myFiles.clear();
+                        myFiles.add(myFile);
+                        etxFile.setText(myFiles.get(0).getName());
+                        totalSize = myFiles.get(0).getSize();
+                        etxSize.setText(Utils.bytesTo(totalSize, sprSize.getSelectedItem().toString()));
                     } catch (FileNotFoundException ex) {
-                        exibirMensagem(getString(R.string.erro_selecionar_arquivo));
+                        showMessage(getString(R.string.select_file_error));
                     }
                 }
             }
         }
     );
 
-    ActivityResultLauncher<Intent> addArquivo = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+    ActivityResultLauncher<Intent> addFilesResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
         result -> {
             if (result.getResultCode() == Activity.RESULT_OK) {
-                arquivos = new ArrayList<>(ArquivoHelper.getArquivos());
-                tamanhoTotal = ArquivoHelper.getTamanhoTotal();
-                etArquivo.setText(R.string.et_arquivo_varios);
-                etTamanho.setText(Utils.calcularTamanho(sprTamanho.getSelectedItem().toString(), tamanhoTotal));
-                ArquivoHelper.clear();
+                myFiles = new ArrayList<>(MyFileHelper.getMyFiles());
+                totalSize = MyFileHelper.getTotalSize();
+                etxFile.setText(R.string.etx_file_various);
+                etxSize.setText(Utils.bytesTo(totalSize, sprSize.getSelectedItem().toString()));
+                MyFileHelper.clear();
             }
         }
     );
@@ -387,19 +377,19 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case REQUEST_CODE_INTERNET:
                 if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    exibirMensagem(getString(R.string.erro_permissao_internet));
+                    showMessage(getString(R.string.internet_permission_error));
                     finish();
                 }
                 break;
             case REQUEST_CODE_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    exibirMensagem(getString(R.string.erro_permissao_armazenamento));
+                    showMessage(getString(R.string.storage_permission_error));
                     finish();
                 }
                 break;
             case REQUEST_CODE_WRITE_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    exibirMensagem(getString(R.string.erro_permissao_armazenamento));
+                    showMessage(getString(R.string.storage_permission_error));
                     finish();
                 }
                 break;
@@ -418,32 +408,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void salvarPreferencias() {
+    private void savePreferences() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("etIP", etIP.getText().toString());
-        editor.putString("etPorta", etPorta.getText().toString());
-        editor.putBoolean("rbInterno", rbInterno.isChecked());
-        editor.putBoolean("cbLote", cbLote.isChecked());
+        editor.putString("etIP", etxIP.getText().toString());
+        editor.putString("etPorta", etxPort.getText().toString());
+        editor.putBoolean("rbInterno", rdoInternal.isChecked());
+        editor.putBoolean("cbLote", chkBatch.isChecked());
         editor.apply();
     }
 
-    private void restaurarPreferencias() {
+    private void restorePreferences() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        etIP.setText(preferences.getString("etIP", ""));
-        etPorta.setText(preferences.getString("etPorta", ""));
-        rbExterno.setChecked(preferences.getBoolean("rbExterno", true));
-        etArmazenamento.setText(getDiretorioSelecionado());
-        cbLote.setChecked(preferences.getBoolean("cbLote", false));
+        etxIP.setText(preferences.getString("etIP", ""));
+        etxPort.setText(preferences.getString("etPorta", ""));
+        rdoExternal.setChecked(preferences.getBoolean("rbExterno", true));
+        etxStorage.setText(getSelectedDir());
+        chkBatch.setChecked(preferences.getBoolean("cbLote", false));
     }
 
-    private String getDiretorioSelecionado() {
-        if(rbExterno.isChecked() && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
+    private String getSelectedDir() {
+        if(rdoExternal.isChecked() && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/";
         } else {
-            if (!rbInterno.isChecked()) {
-                rbInterno.setChecked(true);
-                exibirMensagem(getString(R.string.erro_cartao_sd));
+            if (!rdoInternal.isChecked()) {
+                rdoInternal.setChecked(true);
+                showMessage(getString(R.string.sdcard_error));
             }
             return getFilesDir() + "/" + Environment.DIRECTORY_DOWNLOADS + "/";
         }

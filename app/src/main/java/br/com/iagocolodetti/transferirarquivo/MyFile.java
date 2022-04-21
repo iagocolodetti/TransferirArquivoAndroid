@@ -30,14 +30,14 @@ import java.io.InputStream;
  *
  * @author iagocolodetti
  */
-public class Arquivo {
+public class MyFile {
 
     private ContentResolver contentResolver;
     private Uri uri;
     private String name;
     private long size;
 
-    public Arquivo(Context context, Uri uri) throws FileNotFoundException {
+    public MyFile(Context context, Uri uri) throws FileNotFoundException {
         contentResolver = context.getContentResolver();
         this.uri = uri;
         Cursor cursor = null;
@@ -49,12 +49,12 @@ public class Arquivo {
                 if (!cursor.isNull(sizeIndex)) {
                     size = Long.parseLong(cursor.getString(sizeIndex));
                 } else {
-                    throw new FileNotFoundException(context.getString(R.string.erro_arquivo_tamanho));
+                    throw new FileNotFoundException(context.getString(R.string.file_size_error));
                 }
             }
-            if (name == null || name.isEmpty()) throw new FileNotFoundException(context.getString(R.string.erro_arquivo_nome));
+            if (name == null || name.isEmpty()) throw new FileNotFoundException(context.getString(R.string.file_name_error));
         } catch (FileNotFoundException ex) {
-            throw new FileNotFoundException(context.getString(R.string.erro_arquivo_nao_encontrado));
+            throw new FileNotFoundException(context.getString(R.string.file_not_found_error));
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -76,7 +76,7 @@ public class Arquivo {
 
     @Override
     public boolean equals(Object object) {
-        return getName().equals(((Arquivo)object).getName())
-                && getSize() == ((Arquivo)object).getSize();
+        return getName().equals(((MyFile)object).getName())
+                && getSize() == ((MyFile)object).getSize();
     }
 }

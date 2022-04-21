@@ -46,26 +46,26 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/tvIP"
+                        android:id="@+id/txvIP"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/tv_ip"
+                        android:text="@string/txv_ip"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/etIP"
+                        android:id="@+id/etxIP"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:background="@android:drawable/editbox_background"
                         android:digits="0123456789."
                         android:ems="10"
-                        android:hint="@string/et_ip_hint"
+                        android:hint="@string/etx_ip_hint"
                         android:textColorHint="@color/hintColor"
                         android:importantForAutofill="no"
                         android:inputType="number"
-                        android:labelFor="@id/tvIP"
+                        android:labelFor="@id/txvIP"
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textAlignment="center"
@@ -80,26 +80,26 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/tvPorta"
+                        android:id="@+id/txvPort"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="40dp"
-                        android:text="@string/tv_porta"
+                        android:text="@string/txv_port"
                         android:textColor="@android:color/white"
                         android:textSize="16sp" />
 
                     <EditText
-                        android:id="@+id/etPorta"
+                        android:id="@+id/etxPort"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
                         android:background="@android:drawable/editbox_background"
                         android:ems="10"
-                        android:hint="@string/et_porta_hint"
+                        android:hint="@string/etx_port_hint"
                         android:textColorHint="@color/hintColor"
                         android:importantForAutofill="no"
                         android:inputType="number"
-                        android:labelFor="@id/tvPorta"
+                        android:labelFor="@id/txvPort"
                         android:maxLength="5"
                         android:maxLines="1"
                         android:singleLine="true"
@@ -115,16 +115,16 @@
                 android:orientation="horizontal">
 
                 <EditText
-                    android:id="@+id/etArmazenamento"
+                    android:id="@+id/etxStorage"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="@string/et_armazenamento"
+                    android:hint="@string/etx_storage"
                     android:importantForAutofill="no"
                     android:inputType="none"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:text="@string/et_armazenamento"
+                    android:text="@string/etx_storage"
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
@@ -137,21 +137,21 @@
                 android:orientation="horizontal">
 
                 <RadioButton
-                    android:id="@+id/rbInterno"
+                    android:id="@+id/rdoInternal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/rb_interno"
+                    android:text="@string/rdo_internal"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     tools:ignore="TouchTargetSizeCheck" />
 
                 <RadioButton
-                    android:id="@+id/rbExterno"
+                    android:id="@+id/rdoExternal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/rb_externo"
+                    android:text="@string/rdo_external"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
                     tools:ignore="TouchTargetSizeCheck" />
@@ -164,13 +164,13 @@
                 android:orientation="vertical">
 
                 <Button
-                    android:id="@+id/btConectar"
+                    android:id="@+id/btnConnect"
                     android:layout_width="200dp"
                     android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:background="@drawable/btacende"
-                    android:text="@string/bt_conectar"
+                    android:background="@drawable/mybutton"
+                    android:text="@string/btn_connect"
                     android:textSize="16sp"
                     tools:ignore="InefficientWeight,TouchTargetSizeCheck,TextContrastCheck" />
             </LinearLayout>
@@ -182,15 +182,15 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvArquivo"
+                    android:id="@+id/txvFile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_arquivo"
+                    android:text="@string/txv_file"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
                 <EditText
-                    android:id="@+id/etArquivo"
+                    android:id="@+id/etxFile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -202,7 +202,7 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    android:hint="@string/et_arquivo_hint"
+                    android:hint="@string/etx_file_hint"
                     android:textColorHint="@color/hintColor"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
@@ -213,21 +213,21 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvTamanho"
+                    android:id="@+id/txvSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_tamanho"
+                    android:text="@string/txv_size"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
                 <EditText
-                    android:id="@+id/etTamanho"
+                    android:id="@+id/etxSize"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_weight="0.8"
                     android:ems="10"
-                    android:hint="@string/et_tamanho_hint"
+                    android:hint="@string/etx_size_hint"
                     android:textColorHint="@color/hintColor"
                     android:importantForAutofill="no"
                     android:inputType="none"
@@ -236,14 +236,14 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    tools:ignore="TouchTargetSizeCheck" />
+                    tools:ignore="TextFields,TouchTargetSizeCheck" />
 
                 <Spinner
-                    android:id="@+id/sprTamanho"
+                    android:id="@+id/sprSize"
                     android:layout_width="70dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.2"
-                    android:contentDescription="@string/spr_tamanho_description"
+                    android:contentDescription="@string/spr_size_description"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
 
@@ -254,12 +254,12 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btSelecionar"
+                    android:id="@+id/btnSelect"
                     android:layout_width="120dp"
                     android:layout_height="35dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btacende"
-                    android:text="@string/bt_selecionar"
+                    android:background="@drawable/mybutton"
+                    android:text="@string/btn_select"
                     android:textSize="16sp"
                     tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
 
@@ -270,25 +270,25 @@
                     android:orientation="vertical">
 
                     <CheckBox
-                        android:id="@+id/cbLote"
+                        android:id="@+id/chkBatch"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_gravity="center"
                         android:layout_weight="1"
                         android:button="@drawable/custom_checkbox"
-                        android:text="@string/cb_lote"
+                        android:text="@string/chk_batch"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"
                         tools:ignore="NestedWeights,TouchTargetSizeCheck" />
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/btEnviar"
+                    android:id="@+id/btnSend"
                     android:layout_width="120dp"
                     android:layout_height="35dp"
                     android:layout_weight="1"
-                    android:background="@drawable/btacende"
-                    android:text="@string/bt_enviar"
+                    android:background="@drawable/mybutton"
+                    android:text="@string/btn_send"
                     android:textSize="16sp"
                     tools:ignore="TouchTargetSizeCheck,TextContrastCheck" />
             </LinearLayout>
@@ -299,15 +299,15 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvStatus"
+                    android:id="@+id/txvStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/tv_status"
+                    android:text="@string/txv_status"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
 
                 <EditText
-                    android:id="@+id/etStatus"
+                    android:id="@+id/etxStatus"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.65"
@@ -319,7 +319,7 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    android:hint="@string/et_status_hint"
+                    android:hint="@string/etx_status_hint"
                     android:textColorHint="@color/hintColor"
                     tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
@@ -330,7 +330,7 @@
                 android:orientation="vertical">
 
                 <ProgressBar
-                    android:id="@+id/pbStatus"
+                    android:id="@+id/prgStatus"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="15dp"
@@ -340,11 +340,11 @@
                     android:progressDrawable="@drawable/custom_progressbar" />
 
                 <TextView
-                    android:id="@+id/tvProgresso"
+                    android:id="@+id/txvProgress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
-                    android:layout_alignTop="@id/pbStatus"
+                    android:layout_alignTop="@id/prgStatus"
                     android:textAlignment="center"
                     android:textColor="@android:color/black"
                     android:textSize="11sp"/>
@@ -354,7 +354,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="270dp"
                 android:layout_marginBottom="30dp"
-                android:id="@+id/svAreaLog"
+                android:id="@+id/scvAreaLog"
                 android:background="@android:drawable/editbox_background"
                 android:layout_marginTop="10dp"
                 android:scrollbarStyle="insideInset"
@@ -366,7 +366,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tvAreaLog"
+                    android:id="@+id/txvAreaLog"
                     android:ems="10"
                     android:textColor="@android:color/black"
                     android:textSize="14sp"
