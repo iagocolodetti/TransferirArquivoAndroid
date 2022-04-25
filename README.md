@@ -11,8 +11,8 @@
 <br>
 # Downloads
 https://github.com/iagocolodetti/TransferirArquivoAndroid/releases
-* [TransferirArquivo.apk](https://github.com/iagocolodetti/TransferirArquivoAndroid/releases/download/v1.2/TransferirArquivo.apk "TransferirArquivo.apk")
-* [Código-fonte](https://github.com/iagocolodetti/TransferirArquivoAndroid/archive/v1.2.zip "v1.2.zip")
+* [TransferirArquivo.apk](https://github.com/iagocolodetti/TransferirArquivoAndroid/releases/download/v1.3/TransferirArquivo.apk "TransferirArquivo.apk")
+* [Código-fonte](https://github.com/iagocolodetti/TransferirArquivoAndroid/archive/v1.3.zip "v1.3.zip")
 * [Servidor](https://github.com/iagocolodetti/TransferirArquivo/blob/master/README.md#downloads "TransferirArquivo#Downloads")
 # Descrição
 Projeto desenvolvido com o objetivo de fazer a conexão com um Servidor (PC) para a transferência de myFiles de maneira bidirecional, ou seja, Servidor e Cliente pode tanto receber quanto enviar myFiles.

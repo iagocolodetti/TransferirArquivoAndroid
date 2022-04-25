@@ -57,7 +57,7 @@ public class AddFilesActivity extends AppCompatActivity {
     private ListView addLvwFiles;
     private Button addBtnRemove;
 
-    // <editor-fold defaultstate="collapsed" desc="Métodos">
+    // <editor-fold defaultstate="collapsed" desc="Methods">
     private void showMessage(final String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

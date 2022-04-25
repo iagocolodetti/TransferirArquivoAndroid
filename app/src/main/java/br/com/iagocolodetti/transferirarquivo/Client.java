@@ -196,7 +196,7 @@ public class Client {
                             out.write(buffer, 0, count);
                             receivedBytes += count;
                             progress = (int) (++kb * 100 / sizekb);
-                            mainActivity.setStatusProgress(progress < 100 ? progress : 100);
+                            mainActivity.setProgressStatus(progress < 100 ? progress : 100);
                         }
                         if (receivedBytes == size) {
                             mainActivity.addAreaLog(mainActivity.getString(R.string.file_received, newFileName));
@@ -228,7 +228,7 @@ public class Client {
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         } finally {
-                            mainActivity.setStatusProgress(0);
+                            mainActivity.setProgressStatus(0);
                             mainActivity.setStatus("");
                             mainActivity.keepScreenOn(false);
                         }
@@ -281,7 +281,7 @@ public class Client {
                         out.write(buffer, 0, count);
                         sendedBytes += count;
                         progress = (int) (++kb * 100 / sizekb);
-                        mainActivity.setStatusProgress(progress < 100 ? progress : 100);
+                        mainActivity.setProgressStatus(progress < 100 ? progress : 100);
                     }
                     if (sendedBytes == myFile.getSize()) {
                         mainActivity.addAreaLog(mainActivity.getString(R.string.file_sended, myFile.getName()));
@@ -314,7 +314,7 @@ public class Client {
                         ex.printStackTrace();
                     } finally {
                         mainActivity.setStatus("");
-                        mainActivity.setStatusProgress(0);
+                        mainActivity.setProgressStatus(0);
                         mainActivity.keepScreenOn(false);
                     }
                 }

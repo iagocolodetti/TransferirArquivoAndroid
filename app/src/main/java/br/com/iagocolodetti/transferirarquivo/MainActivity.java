@@ -64,9 +64,7 @@ import br.com.iagocolodetti.transferirarquivo.exception.SendFileException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int REQUEST_CODE_INTERNET = 1001;
-    private final int REQUEST_CODE_READ_EXTERNAL_STORAGE = 1002;
-    private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1003;
+    private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1001;
 
     private Client client = null;
 
@@ -82,7 +80,19 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar prgStatus;
     private ScrollView scvAreaLog;
 
-    // <editor-fold defaultstate="collapsed" desc="Métodos">
+    // <editor-fold defaultstate="collapsed" desc="Methods">
+    private void checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
     public void showMessage(final String message) {
         this.runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
     }
@@ -145,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
         this.runOnUiThread(() -> etxStatus.setText(status));
     }
 
-    public void setStatusProgress(final int valor) {
+    public void setProgressStatus(final int valor) {
         this.runOnUiThread(() -> {
             prgStatus.setProgress(valor);
             txvProgress.setText((valor > 0 ? valor + "%" : ""));
@@ -191,30 +201,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{ Manifest.permission.INTERNET }, REQUEST_CODE_INTERNET);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            try {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.addCategory("android.intent.category.DEFAULT");
-                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
-                storageAccessResult.launch(intent);
-            } catch (Exception ex) {
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                storageAccessResult.launch(intent);
-            }
-        } else {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE }, REQUEST_CODE_READ_EXTERNAL_STORAGE);
-            }
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_CODE_WRITE_EXTERNAL_STORAGE);
-            }
-        }
 
         final Toolbar myToolbar = findViewById(R.id.myToolbar);
         setSupportActionBar(myToolbar);
@@ -316,26 +302,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         restorePreferences();
+        checkPermissions();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         savePreferences();
     }
-
-    ActivityResultLauncher<Intent> storageAccessResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-        result -> {
-            if (result.getResultCode() == Activity.RESULT_OK) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (!Environment.isExternalStorageManager()) {
-                        showMessage(getString(R.string.storage_permission_error));
-                        finish();
-                    }
-                }
-            }
-        }
-    );
 
     ActivityResultLauncher<Intent> chooseFileResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
         result -> {
@@ -374,25 +348,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_CODE_INTERNET:
-                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showMessage(getString(R.string.internet_permission_error));
-                    finish();
-                }
-                break;
-            case REQUEST_CODE_READ_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showMessage(getString(R.string.storage_permission_error));
-                    finish();
-                }
-                break;
-            case REQUEST_CODE_WRITE_EXTERNAL_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    showMessage(getString(R.string.storage_permission_error));
-                    finish();
-                }
-                break;
+        if (requestCode == REQUEST_CODE_WRITE_EXTERNAL_STORAGE) {
+            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                showMessage(getString(R.string.storage_permission_error));
+                finish();
+            }
         }
     }
 
