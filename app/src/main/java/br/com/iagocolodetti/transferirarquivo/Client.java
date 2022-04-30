@@ -42,7 +42,7 @@ public class Client {
     private final int MIN_PORT = 0;
     private final int MAX_PORT = 65535;
 
-    private MainActivity mainActivity;
+    private ClientService clientService;
 
     private Socket socket = null;
 
@@ -57,24 +57,24 @@ public class Client {
     private final int WAIT_AFTER_SEND = 2000;
     private final int WAIT_AFTER_SEND_LOOP = 10;
 
-    public Client(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public Client(ClientService clientService) {
+        this.clientService = clientService;
     }
 
     public void connect(String ip, int port, String dir) throws ClientConnectException {
         if (ip.isEmpty()) {
-            throw new ClientConnectException(mainActivity.getString(R.string.ip_not_defined_error));
+            throw new ClientConnectException(clientService.getString(R.string.ip_not_defined_error));
         }
         if (!Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$").matcher(ip).matches()) {
-            throw new ClientConnectException(mainActivity.getString(R.string.invalid_ip_error));
+            throw new ClientConnectException(clientService.getString(R.string.invalid_ip_error));
         }
         if (port < MIN_PORT || port > MAX_PORT) {
-            throw new ClientConnectException(mainActivity.getString(R.string.port_limit_error, MIN_PORT, MAX_PORT));
+            throw new ClientConnectException(clientService.getString(R.string.port_limit_error, MIN_PORT, MAX_PORT));
         }
         if (!new File(dir).exists() && !new File(dir).mkdir()) {
-            throw new ClientConnectException(mainActivity.getString(R.string.dir_error));
+            throw new ClientConnectException(clientService.getString(R.string.dir_error));
         }
-        mainActivity.connecting();
+        clientService.connecting();
         Thread t = new Thread(new ClientConnect(ip, port, dir));
         t.start();
     }
@@ -89,19 +89,19 @@ public class Client {
             ex.printStackTrace();
         } finally {
             socket = null;
-            mainActivity.disconnected();
+            clientService.disconnected();
         }
     }
 
     public void sendFiles(ArrayList<MyFile> myFiles) throws SendFileException {
         if (!isSocketConnected()) {
-            throw new SendFileException(mainActivity.getString(R.string.not_connected_to_send_error));
+            throw new SendFileException(clientService.getString(R.string.not_connected_to_send_error));
         }
         if (myFiles == null || myFiles.isEmpty()) {
-            throw new SendFileException(mainActivity.getString(R.string.file_not_found_send_error));
+            throw new SendFileException(clientService.getString(R.string.file_not_found_send_error));
         }
         if (receivingFile || sendingFiles()) {
-            throw new SendFileException(mainActivity.getString(R.string.already_sending_error));
+            throw new SendFileException(clientService.getString(R.string.already_sending_error));
         }
         sendingFile = new Thread(new SendFiles(myFiles));
         sendingFile.start();
@@ -125,9 +125,9 @@ public class Client {
 
     private class ClientConnect implements Runnable {
 
-        private String ip;
-        private int port;
-        private String dir;
+        private final String ip;
+        private final int port;
+        private final String dir;
 
         public ClientConnect(String ip, int port, String dir) {
             connected = true;
@@ -148,10 +148,10 @@ public class Client {
                             socket = null;
                             socket = new Socket();
                             socket.connect(new InetSocketAddress(ip, port), CONNECT_TIMEOUT);
-                            mainActivity.connected();
+                            clientService.connected();
                             break;
                         } catch (IllegalArgumentException ex) {
-                            mainActivity.showMessage(mainActivity.getString(R.string.incorrect_ip_port_error));
+                            clientService.showMessage(clientService.getString(R.string.incorrect_ip_port_error));
                             disconnect();
                             ex.printStackTrace();
                             break;
@@ -161,7 +161,7 @@ public class Client {
                         }
                     }
                     if (tries == MAX_RECONNECT_TRIES) {
-                        mainActivity.showMessage(mainActivity.getString(R.string.not_possible_connect_error));
+                        clientService.showMessage(clientService.getString(R.string.not_possible_connect_error));
                         disconnect();
                     }
                 }
@@ -184,9 +184,9 @@ public class Client {
                         sizekb = (sizekb == 0 ? 1 : sizekb);
                         is = socket.getInputStream();
                         out = new FileOutputStream(dir + newFileName);
-                        mainActivity.keepScreenOn(true);
-                        mainActivity.setStatus(mainActivity.getString(R.string.status_receiving_file));
-                        mainActivity.addAreaLog(mainActivity.getString(R.string.receiving_file, newFileName));
+                        clientService.setNotificationContentText(clientService.getString(R.string.notification_receiving_file, newFileName));
+                        clientService.setStatus(clientService.getString(R.string.status_receiving_file));
+                        clientService.addAreaLog(clientService.getString(R.string.receiving_file, newFileName));
                         byte[] buffer = new byte[1024];
                         long receivedBytes = 0;
                         int count;
@@ -196,18 +196,18 @@ public class Client {
                             out.write(buffer, 0, count);
                             receivedBytes += count;
                             progress = (int) (++kb * 100 / sizekb);
-                            mainActivity.setProgressStatus(progress < 100 ? progress : 100);
+                            clientService.setProgressStatus(progress < 100 ? progress : 100);
                         }
                         if (receivedBytes == size) {
-                            mainActivity.addAreaLog(mainActivity.getString(R.string.file_received, newFileName));
+                            clientService.addAreaLog(clientService.getString(R.string.file_received, newFileName));
                         } else {
-                            mainActivity.addAreaLog(mainActivity.getString(R.string.received_file_corrupted, newFileName));
-                            mainActivity.showMessage(mainActivity.getString(R.string.lost_connection_error));
+                            clientService.addAreaLog(clientService.getString(R.string.received_file_corrupted, newFileName));
+                            clientService.showMessage(clientService.getString(R.string.lost_connection_error));
                             disconnect();
                         }
                     } catch (IOException ex) {
                         if (connected && !sendingFiles()) {
-                            mainActivity.showMessage(mainActivity.getString(R.string.lost_connection_error));
+                            clientService.showMessage(clientService.getString(R.string.lost_connection_error));
                             disconnect();
                             ex.printStackTrace();
                         }
@@ -228,9 +228,8 @@ public class Client {
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         } finally {
-                            mainActivity.setProgressStatus(0);
-                            mainActivity.setStatus("");
-                            mainActivity.keepScreenOn(false);
+                            clientService.setProgressStatus(0);
+                            clientService.setStatus("");
                         }
                     }
                 }
@@ -255,7 +254,7 @@ public class Client {
                     threadSleep(WAIT_AFTER_SEND);
                 }
                 if (loop == WAIT_AFTER_SEND_LOOP) {
-                    mainActivity.showMessage(mainActivity.getString(R.string.not_possible_send_error));
+                    clientService.showMessage(clientService.getString(R.string.not_possible_send_error));
                     break;
                 }
                 InputStream is = null;
@@ -267,9 +266,9 @@ public class Client {
                     dos.writeUTF(myFile.getName() + "|" + myFile.getSize());
                     threadSleep(1000);
                     out = socket.getOutputStream();
-                    mainActivity.keepScreenOn(true);
-                    mainActivity.setStatus(mainActivity.getString(R.string.status_sending_file));
-                    mainActivity.addAreaLog(mainActivity.getString(R.string.sending_file, myFile.getName()));
+                    clientService.setNotificationContentText(clientService.getString(R.string.notification_sending_file, myFile.getName()));
+                    clientService.setStatus(clientService.getString(R.string.status_sending_file));
+                    clientService.addAreaLog(clientService.getString(R.string.sending_file, myFile.getName()));
                     byte[] buffer = new byte[1024];
                     long sendedBytes = 0;
                     int count;
@@ -281,18 +280,18 @@ public class Client {
                         out.write(buffer, 0, count);
                         sendedBytes += count;
                         progress = (int) (++kb * 100 / sizekb);
-                        mainActivity.setProgressStatus(progress < 100 ? progress : 100);
+                        clientService.setProgressStatus(progress < 100 ? progress : 100);
                     }
                     if (sendedBytes == myFile.getSize()) {
-                        mainActivity.addAreaLog(mainActivity.getString(R.string.file_sended, myFile.getName()));
+                        clientService.addAreaLog(clientService.getString(R.string.file_sended, myFile.getName()));
                     } else {
-                        mainActivity.addAreaLog(mainActivity.getString(R.string.sended_file_corrupted, myFile.getName()));
+                        clientService.addAreaLog(clientService.getString(R.string.sended_file_corrupted, myFile.getName()));
                     }
                 } catch (FileNotFoundException ex) {
-                    mainActivity.addAreaLog(mainActivity.getString(R.string.file_not_found, myFile.getName()));
+                    clientService.addAreaLog(clientService.getString(R.string.file_not_found, myFile.getName()));
                 } catch (IOException ex) {
                     if (connected) {
-                        mainActivity.showMessage(mainActivity.getString(R.string.lost_connection_error));
+                        clientService.showMessage(clientService.getString(R.string.lost_connection_error));
                         disconnect();
                         ex.printStackTrace();
                     }
@@ -313,9 +312,8 @@ public class Client {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     } finally {
-                        mainActivity.setStatus("");
-                        mainActivity.setProgressStatus(0);
-                        mainActivity.keepScreenOn(false);
+                        clientService.setStatus("");
+                        clientService.setProgressStatus(0);
                     }
                 }
                 threadSleep(WAIT_AFTER_SEND);

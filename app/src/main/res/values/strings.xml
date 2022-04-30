@@ -60,6 +60,15 @@
     </plurals>
     <!-- [AddFilesActivity / activity_add_files] -->
 
+    <!-- [ClientService] -->
+    <!-- Notifications -->
+    <string name="notification_waiting_connection">Aguardando Conexão</string>
+    <string name="notification_connecting">Conectando à %s:%d</string>
+    <string name="notification_connected_to">Conectado à %s:%d</string>
+    <string name="notification_receiving_file">Recebendo Arquivo: \"%s\"</string>
+    <string name="notification_sending_file">Enviando Arquivo: \"%s\"</string>
+    <!-- [ClientService] -->
+
     <!-- [Client] -->
     <string name="status_receiving_file">Recebendo Arquivo</string>
     <string name="receiving_file">Recebendo Arquivo: \"%s\".</string>
@@ -73,7 +82,7 @@
     <!-- Errors -->
     <string name="invalid_ip_error">Digite um IP válido.</string>
     <string name="ip_not_defined_error">Entre com o IP do servidor.</string>
-    <string name="port_limit_error">A porta deve ser no mínimo %d1 e no máximo %d2.</string>
+    <string name="port_limit_error">A porta deve ser no mínimo %d e no máximo %d.</string>
     <string name="dir_error">Não foi possível usar o diretório selecionado.</string>
     <string name="not_connected_to_send_error">É necessário estar conectado a um servidor para enviar arquivo.</string>
     <string name="file_not_found_send_error">Selecione pelo menos um arquivo para enviar.</string>

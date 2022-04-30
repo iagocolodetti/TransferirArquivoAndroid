@@ -26,7 +26,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -35,13 +38,13 @@ import android.os.Environment;
 import android.os.Bundle;
 import androidx.preference.PreferenceManager;
 
+import android.os.IBinder;
 import android.provider.Settings;
 import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -62,11 +65,11 @@ import java.util.Date;
 import br.com.iagocolodetti.transferirarquivo.exception.ClientConnectException;
 import br.com.iagocolodetti.transferirarquivo.exception.SendFileException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ClientServiceCallbacks {
 
     private final int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1001;
 
-    private Client client = null;
+    private ClientService clientService = null;
 
     private ArrayList<MyFile> myFiles = null;
     private long totalSize = 0;
@@ -80,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar prgStatus;
     private ScrollView scvAreaLog;
 
-    // <editor-fold defaultstate="collapsed" desc="Methods">
+    // <editor-fold defaultstate="collapsed" desc="Methods & ClientServiceCallbacks Implementation">
     private void checkPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
             Intent intent = new Intent();
@@ -93,12 +96,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void showMessage(final String message) {
-        this.runOnUiThread(() -> Toast.makeText(this, message, Toast.LENGTH_SHORT).show());
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
     @SuppressLint("SimpleDateFormat")
-    public void addAreaLog(final String message) {
+    public void addAreaLog(String message) {
         this.runOnUiThread(() -> {
             txvAreaLog.append((txvAreaLog.getText().toString().isEmpty() ? "" : "\n") + String.format("[%s] %s", new SimpleDateFormat("HH:mm:ss").format(new Date()), message));
             scvAreaLog.postDelayed(() -> scvAreaLog.fullScroll(View.FOCUS_DOWN), 100);
@@ -111,17 +115,25 @@ public class MainActivity extends AppCompatActivity {
             int port;
             try {
                 port = Integer.parseInt(etxPort.getText().toString());
-                client.connect(etxIP.getText().toString(), port, getSelectedDir());
+                Intent intentService = new Intent(MainActivity.this, ClientService.class);
+                intentService.putExtra("ip", etxIP.getText().toString());
+                intentService.putExtra("port", port);
+                intentService.putExtra("dir", getSelectedDir());
+                bindService(intentService, clientServiceConnection, Context.BIND_AUTO_CREATE);
+                if (Build.VERSION.SDK_INT < 26) {
+                    startService(intentService);
+                } else {
+                    startForegroundService(intentService);
+                }
             } catch (NumberFormatException ex) {
                 showMessage(getString(R.string.port_not_integer_error));
-            } catch (ClientConnectException ex) {
-                showMessage(getString(R.string.parameter_error, ex.getMessage()));
             }
         } else {
             showMessage(getString(R.string.port_not_defined_error));
         }
     }
 
+    @Override
     public void connecting() {
         this.runOnUiThread(() -> {
             btnConnect.setText(getString(R.string.btn_connect_connecting));
@@ -132,43 +144,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
     public void connected() {
         this.runOnUiThread(() -> btnConnect.setText(getString(R.string.btn_connect_disconnect)));
     }
 
     private void disconnect() {
-        client.disconnect();
+        clientService.disconnect();
     }
 
+    @Override
     public void disconnected() {
         this.runOnUiThread(() -> {
-            etxIP.setInputType(InputType.TYPE_CLASS_NUMBER);
-            etxIP.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
-            etxPort.setInputType(InputType.TYPE_CLASS_NUMBER);
-            rdoInternal.setEnabled(true);
-            rdoExternal.setEnabled(true);
-            btnConnect.setText(getString(R.string.btn_connect));
+            try {
+                unbindService(clientServiceConnection);
+                stopService(new Intent(MainActivity.this, ClientService.class));
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+            } finally {
+                clientService = null;
+                etxIP.setInputType(InputType.TYPE_CLASS_NUMBER);
+                etxIP.setKeyListener(DigitsKeyListener.getInstance("0123456789."));
+                etxPort.setInputType(InputType.TYPE_CLASS_NUMBER);
+                rdoInternal.setEnabled(true);
+                rdoExternal.setEnabled(true);
+                btnConnect.setText(getString(R.string.btn_connect));
+            }
         });
     }
 
-    public void setStatus(final String status) {
+    @Override
+    public void setStatus(String status) {
         this.runOnUiThread(() -> etxStatus.setText(status));
     }
 
-    public void setProgressStatus(final int valor) {
+    @Override
+    public void setProgressStatus(int value) {
         this.runOnUiThread(() -> {
-            prgStatus.setProgress(valor);
-            txvProgress.setText((valor > 0 ? valor + "%" : ""));
-        });
-    }
-
-    public void keepScreenOn(final boolean state) {
-        this.runOnUiThread(() -> {
-            if (state) {
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            } else {
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            }
+            prgStatus.setProgress(value);
+            txvProgress.setText((value > 0 ? value + "%" : ""));
         });
     }
 
@@ -207,8 +221,6 @@ public class MainActivity extends AppCompatActivity {
         myToolbar.setSubtitle(Html.fromHtml("<small><i><font color=\"#AAAAAA\">" + getString(R.string.site) + "</font></i></small><br>", Html.FROM_HTML_MODE_LEGACY));
         myToolbar.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.site_url)))));
 
-        client = new Client(this);
-
         myFiles = new ArrayList<>();
 
         etxIP = findViewById(R.id.etxIP);
@@ -243,9 +255,9 @@ public class MainActivity extends AppCompatActivity {
         rdoExternal.setOnClickListener(view -> etxStorage.setText(getSelectedDir()));
 
         btnConnect.setOnClickListener(view -> {
-            if (btnConnect.getText().equals(getString(R.string.btn_connect))) {
+            if (clientService == null) {
                 connect();
-            } else if (btnConnect.getText().equals(getString(R.string.btn_connect_disconnect)) || btnConnect.getText().equals(getString(R.string.btn_connect_connecting))) {
+            } else {
                 disconnect();
             }
         });
@@ -266,7 +278,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSelect.setOnClickListener(view -> {
-            if (!client.sendingFiles()) {
+            if (clientService != null && clientService.sendingFiles()) {
+                showMessage(getString(R.string.still_sending_file_error));
+            } else {
                 if (!chkBatch.isChecked()) {
                     Intent chooseFile = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     chooseFile.addCategory(Intent.CATEGORY_OPENABLE);
@@ -280,15 +294,13 @@ public class MainActivity extends AppCompatActivity {
                     MyFileHelper.setTotalSize(totalSize);
                     addFilesResult.launch(intent);
                 }
-            } else {
-                showMessage(getString(R.string.still_sending_file_error));
             }
         });
 
         btnSend.setOnClickListener(view -> {
-            if (btnConnect.getText().equals(getString(R.string.btn_connect_disconnect))) {
+            if (clientService != null) {
                 try {
-                    client.sendFiles(myFiles);
+                    clientService.sendFiles(myFiles);
                 } catch (SendFileException ex) {
                     showMessage(getString(R.string.parameter_error, ex.getMessage()));
                 }
@@ -309,6 +321,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         savePreferences();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (clientService != null) {
+            clientService.disconnect();
+        }
     }
 
     ActivityResultLauncher<Intent> chooseFileResult = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -371,20 +391,24 @@ public class MainActivity extends AppCompatActivity {
     private void savePreferences() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("etIP", etxIP.getText().toString());
-        editor.putString("etPorta", etxPort.getText().toString());
-        editor.putBoolean("rbInterno", rdoInternal.isChecked());
-        editor.putBoolean("cbLote", chkBatch.isChecked());
+        editor.putString("etxIP", etxIP.getText().toString());
+        editor.putString("etxPort", etxPort.getText().toString());
+        editor.putBoolean("rdoInternal", rdoInternal.isChecked());
+        editor.putBoolean("chkBatch", chkBatch.isChecked());
         editor.apply();
     }
 
     private void restorePreferences() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        etxIP.setText(preferences.getString("etIP", ""));
-        etxPort.setText(preferences.getString("etPorta", ""));
-        rdoExternal.setChecked(preferences.getBoolean("rbExterno", true));
+        etxIP.setText(preferences.getString("etxIP", ""));
+        etxPort.setText(preferences.getString("etxPort", ""));
+        if (preferences.getBoolean("rdoInternal", false)) {
+            rdoInternal.setChecked(true);
+        } else {
+            rdoExternal.setChecked(true);
+        }
         etxStorage.setText(getSelectedDir());
-        chkBatch.setChecked(preferences.getBoolean("cbLote", false));
+        chkBatch.setChecked(preferences.getBoolean("chkBatch", false));
     }
 
     private String getSelectedDir() {
@@ -398,4 +422,23 @@ public class MainActivity extends AppCompatActivity {
             return getFilesDir() + "/" + Environment.DIRECTORY_DOWNLOADS + "/";
         }
     }
+
+    private final ServiceConnection clientServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            ClientService.LocalBinder binder = (ClientService.LocalBinder) service;
+            clientService = binder.getServerInstance();
+            clientService.setMainActivityCallbacks(MainActivity.this);
+            try {
+                clientService.connect();
+            } catch (ClientConnectException ex) {
+                disconnected();
+                showMessage(getString(R.string.parameter_error, ex.getMessage()));
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName className) {
+        }
+    };
 }
